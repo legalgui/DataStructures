@@ -12,17 +12,17 @@ namespace datastruct{
   class Vertex;
 
   // Class that constitutes a Graph Edge structure using Raw Pointers
-  template <class V, E>
+  template <class V, class E>
   class Edge{
 
     E m_info;
-    Vertex<V, E> * target = nullptr;
+    Vertex<V, E> * m_target = nullptr;
 
   public:
 
     Edge() {}
-    Edge(const E t_info, const Vertex<V, E> * t_target): m_info(t_info), m_target(t_target) {};
-    ~Edge() { t_target = nullptr; }
+    Edge(E t_info, Vertex<V, E> * t_target): m_info(t_info), m_target(t_target) {};
+    ~Edge() { m_target = nullptr; }
 
     // Information accesors
     E getInfo() const;
@@ -60,7 +60,7 @@ namespace datastruct{
 
   template <class V, class E>
   std::ostream & operator<<(std::ostream & t_os , const  Edge<V, E> & t_edge){
-      t_os << t_edge.info << " ---> " << t_edge.getTarget()->getInfo() << std::endl;
+      t_os << t_edge.m_info << " ---> " << t_edge.getTarget()->getInfo() << std::endl;
       return t_os;
   }
 

@@ -15,7 +15,7 @@ using datastruct::Edge;
 namespace datastruct{
 
   // Class that constitutes a Graph Vertex structure using Raw Pointers
-  template <class V, E>
+  template <class V, class E>
   class Vertex{
 
     V m_info;
@@ -47,8 +47,8 @@ namespace datastruct{
 
   template <class V, class E>
   Vertex<V, E>::~Vertex(){
-      for (auto  e : m_edges){
-          delete e;
+      for (auto edge : m_edges){
+          delete edge;
       }
       m_edges.clear();
   }
@@ -81,18 +81,18 @@ namespace datastruct{
 
   template <class V, class E>
   bool Vertex<V, E>::operator!=(Vertex<V, E> & t_other) const{
-      return m_info != t_other.info;
+      return m_info != t_other.m_info;
   }
 
   template <class V, class E>
   std::ostream & operator<<(std::ostream & t_os , const  Vertex<V, E> & t_vertex){
-      os << "Vertex: " << t_vertex.info << std::endl;
+      t_os << "Vertex: " << t_vertex.m_info << std::endl;
 
-      for (auto e : t_vertex.edges) {
-          os << *e << std::endl;
+      for (auto edge : t_vertex.m_edges) {
+          t_os << *edge;
       }
 
-      return os;
+      return t_os;
   }
 
 

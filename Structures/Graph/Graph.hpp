@@ -45,32 +45,70 @@ namespace datastruct{
 
   template <class V, class E>
   Graph<V, E>::~Graph(){
-      return;
+    for (auto node : m_nodes){
+        delete node;
+    }
+    m_nodes.clear();
   }
 
   template <class V, class E>
   void Graph<V, E>::addVertex(Vertex<V, E> * t_vertex){
-      return;
+    m_nodes.push_back(t_vertex);
   }
 
   template <class V, class E>
   void Graph<V, E>::addEdge(Vertex<V, E> * t_source, Vertex<V, E> * t_target, const E & t_info){
-      return;
+    Edge<V, E> * edge = new Edge<V, E>(t_info, t_target);
+    t_source->addEdge(edge);
   }
 
   template <class V, class E>
   void Graph<V, E>::removeEdge(Vertex<V, E> * t_source, Vertex<V, E> * t_target, const E & t_info){
-      return;
+    for(auto edge : *t_source->getEdges()){
+      if(edge->getTarget() == t_target && edge->getInfo() == t_info){
+        t_source->removeEdge(edge);
+      }
+    }
   }
 
   template <class V, class E>
   bool Graph<V, E>::isComplete(){
-      return;
+    bool complete = true;
+    std::map<V, int> paths;
+    int complementary = m_nodes.size() - 1;
+
+    for(auto vertex : m_nodes){
+
+      // Check if there's less edges than destinations
+      // To see if we can have an early stop
+      if(vertex->getEdges()->size() < complementary){
+        complete = false;
+        break;
+      }
+
+      // Check that there aren't two edges to the same destination
+      // In case there wasn't an early stop
+      for(auto edge : *vertex->getEdges()){
+        paths[edge->getTarget()->getInfo()]++;
+      }
+
+      if(paths.size() < complementary){
+        complete = false;
+        break;
+      }
+      paths.clear();
+    }
+
+    return complete;
   }
 
   template <class V, class E>
-  std::ostream & operator<<(std::ostream & os, const Graph<V, E> & graph){
-      return;
+  std::ostream & operator<<(std::ostream & t_os, const Graph<V, E> & t_graph){
+    t_os << "--- Graph: " << t_graph.m_name << " ---" << std::endl;
+    for (auto node : t_graph.m_nodes){
+        t_os << *node;
+    }
+    return t_os;
   }
 
 
