@@ -1,2 +1,2 @@
 # DataStructures
-Data Structures implementation and Playground codes with C++
+Data Structures implementation and Playground codes in C++
