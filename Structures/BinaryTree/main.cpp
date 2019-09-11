@@ -31,7 +31,6 @@ int main(){
   BinaryTree<int> btree;
 
   initBPTRArray(nodes);
-
   ensembleTree(nodes, btree);
 
   // Tree Traverse

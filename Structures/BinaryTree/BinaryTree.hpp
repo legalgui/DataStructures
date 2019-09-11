@@ -16,7 +16,7 @@ namespace datastruct{
 
   // Class that constitutes a Binary Tree structure using Raw Pointers
   template <class T>
-  class BinaryTree {
+  class BinaryTree{
 
     BNode<T> * m_root { nullptr };
 

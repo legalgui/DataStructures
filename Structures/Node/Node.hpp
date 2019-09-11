@@ -25,14 +25,16 @@ namespace datastruct{
 
     virtual ~Node();
 
+    // Content accesors
     T getInfo();
     void setInfo(const T &);
 
+    // Next element accesors
     Node<T> * getNext() const;
     void setNext(Node<T> *);
 
     template <typename Tn>
-    friend std::ostream & operator << (std::ostream &, const Node<Tn> &);
+    friend std::ostream & operator<<(std::ostream &, const Node<Tn> &);
   };
 
   // Class specifications
@@ -71,7 +73,7 @@ namespace datastruct{
   }
 
   template <typename T>
-  std::ostream & operator << (std::ostream & t_os, const Node<T> & t_node){
+  std::ostream & operator<<(std::ostream & t_os, const Node<T> & t_node){
     t_os << t_node.m_info;
     return t_os;
   }

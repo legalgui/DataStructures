@@ -39,7 +39,7 @@ namespace datastruct{
     void setRight(BNode<T> *);
 
     template <typename Tn>
-    friend std::ostream & operator << (std::ostream &, const BNode<Tn>  &);
+    friend std::ostream & operator<<(std::ostream &, const BNode<Tn>  &);
   };
 
   template <class T>
@@ -99,7 +99,7 @@ namespace datastruct{
   }
 
   template <class T>
-  std::ostream & operator << (std::ostream & t_os, const BNode<T>  & t_node){
+  std::ostream & operator<<(std::ostream & t_os, const BNode<T>  & t_node){
       t_os << t_node.m_info;
       return t_os;
   }

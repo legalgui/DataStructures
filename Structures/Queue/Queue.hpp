@@ -33,7 +33,7 @@ namespace datastruct{
     bool operator != (const Queue<T> &) const;
 
     template <typename Tn>
-    friend std::ostream & operator << (std::ostream &, const Queue<Tn> &);
+    friend std::ostream & operator<<(std::ostream &, const Queue<Tn> &);
 
   };
 
@@ -84,7 +84,7 @@ namespace datastruct{
   };
 
   template <typename T>
-  std::ostream & operator << (std::ostream & t_os, const Queue<T> & t_queue){
+  std::ostream & operator<<(std::ostream & t_os, const Queue<T> & t_queue){
     for (const Node<T> & node : t_queue) {
       t_os << node << std::endl;
     }

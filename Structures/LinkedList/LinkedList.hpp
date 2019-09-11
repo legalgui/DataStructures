@@ -74,11 +74,15 @@ namespace datastruct{
     Node<T> * operator [](const int);
 
     template <typename Tn>
-    friend std::ostream & operator <<(std::ostream &, const LinkedList<Tn> &);
+    friend std::ostream & operator<<(std::ostream &, const LinkedList<Tn> &);
 
     // Iterator access
     Iterator begin() const { return { this, 0 }; }
     Iterator end() const { return { this, m_size }; }
+
+
+    void insertOrdered(const T & element, int dir);
+    void insertOrdered(Node<T> * node, int dir);
   };
 
   // Class specifications
@@ -99,7 +103,7 @@ namespace datastruct{
   }
 
 
-  template  <class T>
+ template  <class T>
   LinkedList<T>::~LinkedList(){
     clear();
   }
@@ -268,12 +272,50 @@ namespace datastruct{
   }
 
   template <class Tn>
-  std::ostream & operator <<(std::ostream & t_os, const LinkedList<Tn> & t_linkedList){
+  std::ostream & operator<<(std::ostream & t_os, const LinkedList<Tn> & t_linkedList){
     for (const Node<Tn> & node : t_linkedList ){
       t_os << node << std::endl;
     }
     return t_os;
   }
+
+  template  <class T>
+  void LinkedList<T>::insertOrdered(const T & element, int dir)
+  {
+      /* Crear el nuevo nodo a insertar */
+      Node<T> * newnode = new Node<T>(element);
+      if (m_size <= 0)
+      {
+      this->insertBack(newnode);
+      }
+      else
+  {
+    int i = 0;
+    if (dir == 1)
+    {
+          while(i < LinkedList<T>::size() && element->getFrecuencia() < LinkedList<T>::at(i)->getInfo()->getFrecuencia())
+    {
+      ++i;
+    }
+    LinkedList<T>::insert(element, i);
+    }
+    else
+    {
+    while(i < LinkedList<T>::size() && element->getFrecuencia() > LinkedList<T>::at(i)->getInfo()->getFrecuencia())
+    {
+      ++i;
+    }
+    LinkedList<T>::insert(element, i);
+    }
+  }
+  }
+
+  template  <class T>
+  void LinkedList<T>::insertOrdered(Node<T> * node, int dir)
+  {
+      this->insert(node, this->_size);
+  }
+
 }
 
 #endif /* LINKED_LIST_HPP */
