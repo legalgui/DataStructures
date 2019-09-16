@@ -19,6 +19,7 @@ namespace datastruct{
   class BinaryTree{
 
     BNode<T> * m_root { nullptr };
+    std::ostream& print(std::ostream&, BNode<T> *);
 
   public:
 
@@ -72,6 +73,9 @@ namespace datastruct{
     // Tree structure modification
     void invert();
     void invert(BNode<T> *);
+
+    template <class Tn>
+    friend std::ostream & operator<<(std::ostream &, BinaryTree<Tn> &);
   };
 
   template <class T>
@@ -124,7 +128,7 @@ namespace datastruct{
 
   template <class T>
   bool BinaryTree<T>::insert(BNode<T> * t_parent, BNode<T> * t_node){
-    bool inserted = false;
+    bool inserted { false };
 
     if(empty() || !t_parent){
         setRoot(t_node);
@@ -206,8 +210,8 @@ namespace datastruct{
   template <class T>
   int BinaryTree<T>::getDepth(BNode<T> * t_node) const{
     if(t_node){
-      BNode<T> * aux = t_node;
-      int depth = 1;
+      BNode<T> * aux { t_node };
+      int depth { 1 };
 
       while(aux->getParent()){
         depth++;
@@ -240,8 +244,8 @@ namespace datastruct{
 
   template <class T>
   bool BinaryTree<T>::validateCousins(BNode<T> * t_first, BNode<T> * t_second) const{
-    int fDepth = getDepth(t_first);
-    int sDepth = getDepth(t_second);
+    int fDepth = { getDepth(t_first) };
+    int sDepth = { getDepth(t_second) };
     return (fDepth == sDepth) && (t_first->getParent() != t_second->getParent());
   };
 
@@ -272,7 +276,7 @@ namespace datastruct{
 
   template <class T>
   BNode<T> * BinaryTree<T>::search(T t_info, BNode<T> * t_root){
-    BNode<T> * foundNode = nullptr;
+    BNode<T> * foundNode { nullptr };
     if(t_root){
       if(t_root->getInfo() == t_info){
         return t_root;
@@ -319,7 +323,7 @@ namespace datastruct{
   template <class T>
   void BinaryTree<T>::invert(BNode<T> * t_root){
     if(t_root){
-      BNode<T> * aux = t_root->getLeft();
+      BNode<T> * aux { t_root->getLeft() };
       t_root->setLeft(t_root->getRight());
       t_root->setRight(aux);
       invert(t_root->getLeft());
@@ -327,6 +331,22 @@ namespace datastruct{
     }
   }
 
+  template <class T>
+  std::ostream & BinaryTree<T>::print(std::ostream & t_os, BNode<T> * t_node)
+  {
+      if (t_node) {
+          t_os << *t_node;
+          print(t_os, t_node->getLeft());
+          print(t_os, t_node->getRight());
+      }
+      return t_os;
+  }
+
+  template <class Tn>
+  std::ostream & operator<<(std::ostream & t_os, BinaryTree<Tn> & t_binaryTree)
+  {
+      return t_binaryTree.print(t_os, t_binaryTree.m_root);
+  }
 }
 
 #endif /* BINARY_TREE_HPP */

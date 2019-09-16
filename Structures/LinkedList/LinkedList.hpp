@@ -278,44 +278,6 @@ namespace datastruct{
     }
     return t_os;
   }
-
-  template  <class T>
-  void LinkedList<T>::insertOrdered(const T & element, int dir)
-  {
-      /* Crear el nuevo nodo a insertar */
-      Node<T> * newnode = new Node<T>(element);
-      if (m_size <= 0)
-      {
-      this->insertBack(newnode);
-      }
-      else
-  {
-    int i = 0;
-    if (dir == 1)
-    {
-          while(i < LinkedList<T>::size() && element->getFrecuencia() < LinkedList<T>::at(i)->getInfo()->getFrecuencia())
-    {
-      ++i;
-    }
-    LinkedList<T>::insert(element, i);
-    }
-    else
-    {
-    while(i < LinkedList<T>::size() && element->getFrecuencia() > LinkedList<T>::at(i)->getInfo()->getFrecuencia())
-    {
-      ++i;
-    }
-    LinkedList<T>::insert(element, i);
-    }
-  }
-  }
-
-  template  <class T>
-  void LinkedList<T>::insertOrdered(Node<T> * node, int dir)
-  {
-      this->insert(node, this->_size);
-  }
-
 }
 
 #endif /* LINKED_LIST_HPP */
