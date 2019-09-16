@@ -1,5 +1,5 @@
 // Sebastian Galguera
-// Priority Linked List class for datastructure representation
+// Priority Handler for Huffman implementation
 
 // Guards
 #ifndef PRIORITY_HANDLER_HPP
@@ -10,9 +10,9 @@
 using datastruct::LinkedList;
 
 // Namespace enclosing
-namespace datastruct{
+namespace huffmanutilities{
 
-  // Class that constitutes a Stack structure inheriting from Linked List
+  // Class that constitutes a Piority Handler for Huffman Compression
   template <class T>
   class PriorityHandler{
 
@@ -24,11 +24,11 @@ namespace datastruct{
     ~PriorityHandler();
 
     LinkedList<T> * getList();
-    void insertOrdered(T, std::string);
+    void insertOrdered(T);
 
     // Utility functions for the ordered insertion
-    int getPosition(T & t_element, std::string & t_dir);
-    void advance(int & position, bool t_cond);
+    int getPosition(T &);
+    void advance(int &, T &);
 
   };
 
@@ -44,29 +44,27 @@ namespace datastruct{
   };
 
   template <class T>
-  void PriorityHandler<T>::insertOrdered(T t_element, std::string t_dir){
+  void PriorityHandler<T>::insertOrdered(T t_element){
     if(m_list->empty()){
       m_list->insertBack(t_element);
     }else{
-      int position = getPosition(t_element, t_dir);
+      int position = getPosition(t_element);
       m_list->insert(t_element, position);
     }
   }
 
   template <class T>
-  int PriorityHandler<T>::getPosition(T & t_element, std::string & t_dir){
+  int PriorityHandler<T>::getPosition(T & t_element){
     int position = 0;
-    bool cond = t_element > m_list->at(position)->getInfo();
-
-    if(t_dir == "asc"){ advance(position, cond);
-    }else{ advance(position, !cond); }
-
+    advance(position, t_element);
     return position;
   }
 
   template <class T>
-  void PriorityHandler<T>::advance(int & t_position, bool t_cond){
-    while(t_position < m_list->size() && t_cond){ ++t_position; }
+  void PriorityHandler<T>::advance(int & t_position, T & t_element){
+    while(t_position < m_list->size() && (*t_element->getInfo() > *m_list->at(t_position)->getInfo()->getInfo())){
+      ++t_position;
+    }
   }
 
 }

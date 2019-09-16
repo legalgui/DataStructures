@@ -1,40 +1,57 @@
 // Sebastian Galguera
 // Code to implement Message Compression System
 
-#include <iostream>
-#include <vector>
-
-//#include "PriorityHandler.hpp"
-
 //using datastruct::PriorityHandler;
-
-
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
+
 #include <time.h>
-#include "../../Structures/LinkedList/LinkedList.hpp"
-using datastruct::LinkedList;
-#include "BinaryTree.h"
-#include "Terminal.h"
-#include "Tabla.h"
 
 
-void espacio()
-{
-    for(int i = 0; i<=15; i++)
-    {
-        std::cout << " " << std::endl;
+#include "../../Structures/BinaryTree/BinaryTree.hpp"
+using datastruct::BinaryTree;
+
+#include "../../Structures/Stack/Stack.hpp"
+using datastruct::Stack;
+
+#include "PriorityHandler.hpp"
+using huffmanutilities::PriorityHandler;
+
+#include "Symbol.hpp"
+using huffmanutilities::Symbol;
+
+#include "Terminal.hpp"
+using huffmanutilities::Terminal;
+
+
+struct Tabla{
+  Tabla(char symbol, std::string code): symbol(symbol), code(code){}
+  char symbol;
+  std::string code;
+};
+
+template <class T>
+BNode<T> * searchTree(T t_info, BNode<T> * t_root){
+  BNode<T> * foundNode = nullptr;
+  if(t_root){
+    if(*t_root->getInfo() == *t_info){
+      return t_root;
+    }else{
+      foundNode = searchTree(t_info, t_root->getLeft());
+
+      if(foundNode){
+        return foundNode;
+      }
+
+      return searchTree(t_info, t_root->getRight());
     }
-}
+  }
+  return foundNode;
+};
 
-int huffman(std::string, int &);
+int huff(std::string, int &);
 
 int main()
 {
-    espacio();
     std::cout << "----------------------------------------------" << std::endl;
     std::cout << "          COMUNICACIONES SA. DE CV.           " << std::endl;
     std::cout << "----------------------------------------------" << std::endl;
@@ -70,18 +87,18 @@ int main()
             {
                 case 1:
                 {
-                    std::cout << "Por favor, de de alta una terminal.\n\nNombre de la terminal: ";
-                    std::string nombre;
+                    std::cout << "Por favor, de de alta una terminal.\n\nname de la terminal: ";
+                    std::string name;
                     std::cin.ignore();
-                    std::getline (std::cin,nombre);
+                    std::getline (std::cin,name);
 
                     std::cout << "Password de la terminal: ";
                     std::string password;
                     std::getline (std::cin,password);
 
-                    listaTerminales.insertBack(new Terminal(nombre, password, terminalID));
+                    listaTerminales.insertBack(new Terminal(name, password, terminalID));
 
-                    std::cout << "\n\tTerminal " << nombre << " creada con exito.\n\tEl password es: " << password << " con Posicion: " << terminalID << std::endl << std::endl;
+                    std::cout << "\n\tTerminal " << name << " creada con exito.\n\tEl password es: " << password << " con Posicion: " << terminalID << std::endl << std::endl;
                     terminalID++;
 
                     break;
@@ -92,20 +109,20 @@ int main()
                         std::cout << "\nNo hay terminales aun." << std::endl;
                     }
                     else{
-                        if (listaTerminales.at(0)->getInfo()->listaMensajesEnviados.size()){
+                        if (listaTerminales.at(0)->getInfo()->getSent()->size()){
 
-                            std::string sError = listaTerminales.at(0)->getInfo()->listaMensajesEnviados.at(0)->getInfo();
-                            huffman(sError, auxHuffman);
+                            std::string sError = listaTerminales.at(0)->getInfo()->getSent()->at(0)->getInfo();
+                            huff(sError, auxHuffman);
 
                             if (auxHuffman == 1){
-                                std::cout << "La terminal " << listaTerminales.at(0)->getInfo()->getNombre() << " no funciona correctamente." << std::endl;
+                                std::cout << "La terminal " << listaTerminales.at(0)->getInfo()->getName() << " no funciona correctamente." << std::endl;
                                 std::cout << "Apagando..." << std::endl;
                                 listaTerminales.remove(0);
                                 terminalID--;
 
                             }
                             else if (auxHuffman == 0){
-                                std::cout << "La terminal " << listaTerminales.at(0)->getInfo()->getNombre() << " funciona correctamente." << std::endl;
+                                std::cout << "La terminal " << listaTerminales.at(0)->getInfo()->getName() << " funciona correctamente." << std::endl;
                             }
                         }
                         else{
@@ -127,11 +144,11 @@ int main()
             std::cout << "----------------------------------------------" << std::endl;
             std::cout << "                MENU USUARIO                  " << std::endl;
             std::cout << "----------------------------------------------" << std::endl;
-            std::cout << "\nPor favor, ingrese los datos de acceso.\n\nNombre: ";
+            std::cout << "\nPor favor, ingrese los datos de acceso.\n\nname: ";
 
-            std::string nombre;
+            std::string name;
             std::cin.ignore();
-            std::getline (std::cin,nombre);
+            std::getline (std::cin,name);
 
             std::cout << "Password: ";
             std::string password;
@@ -140,7 +157,7 @@ int main()
             int acceso = 0;
 
             for(int i = 0; i < listaTerminales.size(); i++){
-                if ((nombre == listaTerminales.at(i)->getInfo()->getNombre()) && (password == listaTerminales.at(i)->getInfo()->getPassword())){
+                if ((name == listaTerminales.at(i)->getInfo()->getName()) && (password == listaTerminales.at(i)->getInfo()->getPassword())){
                     acceso = 1;
                     auxID = i;
                 }
@@ -151,7 +168,7 @@ int main()
                 std::cout << "----------------------------------------------" << std::endl;
                 std::cout << "               MENU TERMINAL                  " << std::endl;
                 std::cout << "----------------------------------------------" << std::endl;
-                std::cout << "\nBienvenido a la terminal " << listaTerminales.at(auxID)->getInfo()->getNombre() << " con Posicion " << auxID  << std::endl;
+                std::cout << "\nBienvenido a la terminal " << listaTerminales.at(auxID)->getInfo()->getName() << " con Posicion " << auxID  << std::endl;
                 std::cout << "\n1.- Enviar mensaje.\n2.- Ver historial de envios.\n3.- Ver historial de recibidos.\n4.- Salir.\n\nPor favor, seleccione una opcion: ";
                 std::cin >> conmutador;
                 switch(conmutador)
@@ -159,16 +176,16 @@ int main()
                     case 1:
                     {
 
-                        std::cout << "\nIngrese el Nombre de la terminal receptora: ";
-                        std::string nombre;
+                        std::cout << "\nIngrese el name de la terminal receptora: ";
+                        std::string name;
                         std::cin.ignore();
-                        std::getline(std::cin,nombre);
+                        std::getline(std::cin,name);
 
                         acceso = 0;
                         int auxIDDos;
 
                         for(int i = 0; i < listaTerminales.size(); i++){
-                            if (nombre == listaTerminales.at(i)->getInfo()->getNombre()){
+                            if (name == listaTerminales.at(i)->getInfo()->getName()){
                                 acceso = 1;
                                 auxIDDos = i;
 
@@ -176,7 +193,7 @@ int main()
                                 std::string frase, fraseCopy, codeAux;
                                 std::getline (std::cin,frase);
                                 fraseCopy = frase;
-                                LinkedList<BNode *> listaOrdenadaFrase;
+                                LinkedList<BNode<Symbol *> *> listaOrdenadaFrase;
 
                                 /*Aqui se identifican los caracteres y las frecuencias, construyendo los nodos.*/
                                 for (int i = 0; i < frase.size(); i++){
@@ -193,15 +210,16 @@ int main()
                                         std::stringstream sAux;
                                         sAux << auxChar;
                                         sAux >> auxLeafChar;
-                                        BNode *leafNode = new BNode(auxLeafChar, charCount);
-                                        listaOrdenadaFrase.insertOrdered(leafNode, 2);
+                                        BNode<Symbol *> *leafNode = new BNode<Symbol *>(new Symbol(auxLeafChar, charCount));
+                                        PriorityHandler<BNode<Symbol *> *> ph(&listaOrdenadaFrase);
+                                        ph.insertOrdered(leafNode);
                                     }
                                 }
                                 std::cout << "----------------------------------------------" << std::endl;
                                 std::cout << "          TABLA DE FRECUENCIAS                " << std::endl;
                                 std::cout << "----------------------------------------------" << std::endl;
                                 for(int i = 0; i < listaOrdenadaFrase.size(); i++){
-                                    std::cout << *listaOrdenadaFrase.at(i)->getInfo() << std::endl;
+                                    std::cout << *listaOrdenadaFrase.at(i)->getInfo()->getInfo() << std::endl;
                                 }
 
                                 /*Aqui comienza la construccion del arbol.*/
@@ -210,28 +228,31 @@ int main()
                                 std::cout << "----------------------------------------------" << std::endl;
                                 while (listaOrdenadaFrase.size()!=1){
 
-                                    BNode * leftBNode = listaOrdenadaFrase.removeFront()->getInfo();
-                                    leftBNode->setPathBinario(0);
-                                    std::cout << "left node " << *leftBNode << std::endl;
+                                    BNode<Symbol *> * leftBNode = listaOrdenadaFrase.removeFront()->getInfo();
+                                    leftBNode->getInfo()->setBinaryPath(0);
+                                    std::cout << "left node " << *leftBNode->getInfo()  << std::endl;
 
-                                    BNode *  rightBNode = listaOrdenadaFrase.removeFront()->getInfo();
-                                    rightBNode->setPathBinario(1);
-                                    std::cout << "right node " << *rightBNode<< std::endl;
+                                    BNode<Symbol *> *  rightBNode = listaOrdenadaFrase.removeFront()->getInfo();
+                                    rightBNode->getInfo()->setBinaryPath(1);
+                                    std::cout << "right node " << *rightBNode->getInfo() << std::endl;
 
-                                    std::string dataInterna = leftBNode->getCaracter();
-                                    dataInterna += rightBNode->getCaracter();
-                                    int frecuenciaInterna = (leftBNode->getFrecuencia()+rightBNode->getFrecuencia());
-                                    BNode * internalNode = new BNode(dataInterna, frecuenciaInterna);
-                                    std::cout <<  "internal node " << *internalNode << std::endl;
+                                    std::string dataInterna = leftBNode->getInfo()->getSymbol();
+                                    dataInterna += rightBNode->getInfo()->getSymbol();
+                                    int frecuenciaInterna = (leftBNode->getInfo()->getFrequency()+rightBNode->getInfo()->getFrequency());
+                                    BNode<Symbol *> * internalNode = new BNode<Symbol *>(new Symbol(dataInterna, frecuenciaInterna));
+                                    std::cout <<  "internal node " << *internalNode->getInfo() << std::endl;
 
                                     internalNode->setParent(NULL);
                                     internalNode->setLeft(leftBNode);
                                     leftBNode->setParent(internalNode);
                                     internalNode->setRight(rightBNode);
                                     rightBNode->setParent(internalNode);
-                                    listaOrdenadaFrase.insertOrdered(internalNode, 2);
+                                    PriorityHandler<BNode<Symbol *> *> ph(&listaOrdenadaFrase);
+                                    ph.insertOrdered(internalNode);
+                                    //listaOrdenadaFrase.insertOrdered(internalNode, 2);
                                 }
-                                BinaryTree arbolHuffman(listaOrdenadaFrase.removeFront()->getInfo());
+                                BinaryTree<Symbol *> arbolHuffman;
+                                arbolHuffman.setRoot(listaOrdenadaFrase.removeFront()->getInfo());
                                 LinkedList<Tabla *> listTabla;
 
                                 std::cout << "----------------------------------------------" << std::endl;
@@ -245,15 +266,15 @@ int main()
                                         sAuxDos << frase[i];
                                         sAuxDos >> auxString;
 
-                                        BNode * auxBN = arbolHuffman.search(auxString);
-                                        Stack<int> stackPath;
 
-                                        stackPath.push(auxBN->getPathBinario());
+                                        BNode<Symbol *> * auxBN = searchTree<Symbol *>(new Symbol(auxString, 0), arbolHuffman.getRoot());
+                                        Stack<int> stackPath;
+                                        stackPath.push(auxBN->getInfo()->getBinaryPath());
                                         int k;
                                         std::string code;
 
-                                        while(auxBN->getParent()!=arbolHuffman.getRaiz()){
-                                            stackPath.push(auxBN->getParent()->getPathBinario());
+                                        while(auxBN->getParent()!=arbolHuffman.getRoot()){
+                                            stackPath.push(auxBN->getParent()->getInfo()->getBinaryPath());
                                             auxBN = auxBN->getParent();
                                         }
 
@@ -273,8 +294,8 @@ int main()
 
                                 for (int i = 0; i < frase.size(); i++){
                                     for (int j = 0; j < listTabla.size(); j++){
-                                        if (fraseCopy[i] == listTabla.at(j)->getInfo()->getLetra()){
-                                                codeAux += listTabla.at(j)->getInfo()->getCode();
+                                        if (fraseCopy[i] == listTabla.at(j)->getInfo()->symbol){
+                                                codeAux += listTabla.at(j)->getInfo()->code;
                                         }
                                     }
                                 }
@@ -283,8 +304,8 @@ int main()
                                 float x = (1-(codeAux.size()/(fraseCopy.size()*asci)))*100;
                                 std::cout << "\nBits originales: "<< fraseCopy.size()*8 << "\nBits finales: " << codeAux.size() << "\nEconomizacion: %" << x << std::endl;
 
-                                listaTerminales.at(auxID)->getInfo()->setEnviado(codeAux);
-                                listaTerminales.at(auxIDDos)->getInfo()->setRecibido(codeAux);
+                                listaTerminales.at(auxID)->getInfo()->setSent(codeAux);
+                                listaTerminales.at(auxIDDos)->getInfo()->setReceived(codeAux);
                             }
                         }
                         if(acceso == 0){
@@ -297,8 +318,8 @@ int main()
                         std::cout << "----------------------------------------------" << std::endl;
                         std::cout << "             HISTORIAL DE ENVIOS              " << std::endl;
                         std::cout << "----------------------------------------------" << std::endl;
-                        for (int i = 0; i < listaTerminales.at(auxID)->getInfo()->listaMensajesEnviados.size(); i++){
-                            std::cout << listaTerminales.at(auxID)->getInfo()->listaMensajesEnviados.at(i)->getInfo() << std::endl;
+                        for (int i = 0; i < listaTerminales.at(auxID)->getInfo()->getSent()->size(); i++){
+                            std::cout << listaTerminales.at(auxID)->getInfo()->getSent()->at(i)->getInfo() << std::endl;
                         }
                         break;
                     }
@@ -307,8 +328,8 @@ int main()
                         std::cout << "----------------------------------------------" << std::endl;
                         std::cout << "             HISTORIAL DE RECIBIDOS           " << std::endl;
                         std::cout << "----------------------------------------------" << std::endl;
-                        for (int i = 0; i < listaTerminales.at(auxID)->getInfo()->listaMensajesRecibidos.size(); i++){
-                            std::cout << listaTerminales.at(auxID)->getInfo()->listaMensajesRecibidos.at(i)->getInfo() << std::endl;
+                        for (int i = 0; i < listaTerminales.at(auxID)->getInfo()->getReceived()->size(); i++){
+                            std::cout << listaTerminales.at(auxID)->getInfo()->getReceived()->at(i)->getInfo() << std::endl;
                         }
                         break;
                     }
@@ -320,7 +341,7 @@ int main()
                 }
             }
             else{
-                std::cout << "Lo sentimos, nombre o password erroneos.\n" << std::endl;
+                std::cout << "Lo sentimos, name o password erroneos.\n" << std::endl;
             }
             break;
         }
@@ -333,7 +354,7 @@ int main()
     }/*Fin del while*/
 }
 
-int huffman(std::string binary, int &auxHuffman)
+int huff(std::string binary, int &auxHuffman)
 {
    int bits[7],paridad[7],i,bitOne,bitTwo,bitThree,bit;
 
