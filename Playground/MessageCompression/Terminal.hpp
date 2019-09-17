@@ -48,7 +48,7 @@ namespace huffmanutilities{
   Terminal::~Terminal(){
     delete m_sentMsg;
     delete m_recievedMsg;
-  }
+  };
 
   void Terminal::setName(const std::string t_name){
     m_name = t_name;
@@ -56,7 +56,7 @@ namespace huffmanutilities{
 
   std::string Terminal::getName() const {
     return m_name;
-  }
+  };
 
   void Terminal::setPassword(const std::string t_password){
     m_password = t_password;
@@ -64,28 +64,27 @@ namespace huffmanutilities{
 
   std::string Terminal::getPassword() const{
     return m_password;
-  }
+  };
 
   void Terminal::addReceived(const std::string t_received){
     m_recievedMsg->insertBack(t_received);
-  }
+  };
 
   LinkedList<std::string> * Terminal::getReceived() const {
     return m_recievedMsg;
-  }
-
+  };
 
   void Terminal::addSent(const std::string t_sent){
     m_sentMsg->insertBack(t_sent);
-  }
+  };
 
   LinkedList<std::string> * Terminal::getSent() const {
     return m_sentMsg;
-  }
+  };
 
   int Terminal::getID() const {
     return m_ID;
-  }
+  };
 }
 
 #endif /* TERMINAL_HPP */

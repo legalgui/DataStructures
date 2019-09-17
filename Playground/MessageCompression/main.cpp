@@ -65,7 +65,7 @@ int main(){
         bool loggedIn = login(terminals, sessionID);
 
         if(loggedIn){
-          while(selectedOpt!=4){
+          while(selectedOpt != 4){
             // Terminal section
             std::cout << "\n Welcome to Terminal  " << terminals.at(sessionID)->getInfo()->getName() << std::endl;
             printHeader("TERMINAL MENU");

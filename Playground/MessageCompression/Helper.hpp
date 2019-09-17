@@ -10,9 +10,9 @@ namespace huffmanutilities{
 
   // Structure for symbol code handling
   struct Table{
-    Table(char symbol, std::string code): symbol(symbol), code(code){}
-    char symbol;
-    std::string code;
+    Table(char t_symbol, std::string t_code): symbol(t_symbol), code(t_code){}
+    char m_symbol;
+    std::string m_code;
   };
 
 
@@ -114,7 +114,7 @@ namespace huffmanutilities{
 
       for (int i = 0; i < 4; i++){ std::cout << t_bin[i] << " "; }
 
-      for (int i = 0; i<=4; i++){
+      for (int i = 0; i <= 4; i++){
         if (i != 3){
           if(t_bin[i] == '0'){ bits[i] = 0;
           }else{ bits[i] = 1; }
@@ -126,7 +126,7 @@ namespace huffmanutilities{
       bits[3] = bits[0]^bits[1]^bits[2];
 
       printf("\nThe sequence with parity bits is: \n");
-      for (int i=0;i<7;i++) { std::cout << bits[i] << " "; }
+      for (int i = 0; i < 7; i++) { std::cout << bits[i] << " "; }
 
       std::cout << "\nVerifying if there's a problem..." << std::endl;
 
@@ -134,7 +134,7 @@ namespace huffmanutilities{
       int v1 { rand() % 2 };
       int v2 { rand() % 8 };
       int parity[7];
-      int bit { 1 } ;
+      int bit { 3 } ;
 
       if (v1 == 0){
           bit = 0;
@@ -142,7 +142,8 @@ namespace huffmanutilities{
         for(int i = 0; i < 7; i++){ parity[i] = bits[i]; }
         if (parity[v2] == 0){ parity[v2] = 1;
         }else{ parity[v2] = 0; }
-        int bitOne, bitTwo, bitThree, bit;
+
+        int bitOne, bitTwo, bitThree;
         bitOne = parity[6]^parity[4]^parity[2]^parity[0];
         bitTwo = parity[5]^parity[4]^parity[1]^parity[0];
         bitThree = parity[3]^parity[2]^parity[1]^parity[0];
@@ -153,8 +154,8 @@ namespace huffmanutilities{
         std::cout << "\nNo error was found." << std::endl;
         return false;
       }else{
-        std::cout << "\nError in position: " << 8-bit << "\nThe corrected message is: " << std::endl;;
-        if(parity[7 - bit] == 0){ parity[7-bit] = 1;
+        std::cout << "\nError in position: " << 8 - bit << "\nThe corrected message is: " << std::endl;;
+        if(parity[7 - bit] == 0){ parity[7 - bit] = 1;
         }else{ parity[7 - bit] = 0; }
         for (int i = 0; i < 7; i++){ printf("%d ",parity[i]); }
         return true;
@@ -312,8 +313,8 @@ namespace huffmanutilities{
       std::string code;
       for(int i = 0; i < t_msg.size(); i++){
           for(int j = 0; j < t_tables.size(); j++){
-              if(t_msg[i] == t_tables.at(j)->getInfo()->symbol){
-                      code += t_tables.at(j)->getInfo()->code;
+              if(t_msg[i] == t_tables.at(j)->getInfo()->m_symbol){
+                      code += t_tables.at(j)->getInfo()->m_code;
               }
           }
       }
