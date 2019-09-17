@@ -36,14 +36,13 @@ namespace huffmanutilities{
       void setPassword(const std::string);
       std::string getPassword() const ;
 
-      void setReceived(const std::string);
+      void addReceived(const std::string);
       LinkedList<std::string> * getReceived() const;
 
-      void setSent(const std::string);
+      void addSent(const std::string);
       LinkedList<std::string> * getSent() const;
 
       int getID() const;
-
   };
 
   Terminal::~Terminal(){
@@ -67,7 +66,7 @@ namespace huffmanutilities{
     return m_password;
   }
 
-  void Terminal::setReceived(const std::string t_received){
+  void Terminal::addReceived(const std::string t_received){
     m_recievedMsg->insertBack(t_received);
   }
 
@@ -76,7 +75,7 @@ namespace huffmanutilities{
   }
 
 
-  void Terminal::setSent(const std::string t_sent){
+  void Terminal::addSent(const std::string t_sent){
     m_sentMsg->insertBack(t_sent);
   }
 
