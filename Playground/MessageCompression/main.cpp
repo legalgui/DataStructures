@@ -1,7 +1,6 @@
 // Sebastian Galguera
 // Code to implement Message Compression System
 
-//using datastruct::PriorityHandler;
 #include <sstream>
 
 #include <time.h>
