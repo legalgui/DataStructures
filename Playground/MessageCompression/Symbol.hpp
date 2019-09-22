@@ -8,6 +8,7 @@
 // Namespace enclosing
 namespace huffmanutilities{
   class Symbol{
+    
     std::string m_symbol { "" };
     int m_frequency { 0 };
     int m_binPath { 0 };

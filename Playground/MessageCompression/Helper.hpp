@@ -18,6 +18,8 @@ namespace huffmanutilities{
 
   // Session handlers
   namespace session{
+
+    // Function for logging in
     bool login(LinkedList<Terminal *> & t_terminals, int & sessionID){
       std::cout << "\nPlease, specify the login information.\n\n Name: ";
 
@@ -40,6 +42,7 @@ namespace huffmanutilities{
     }
 
 
+    // Function to connect to other terminal
     bool connect(LinkedList<Terminal *> & t_terminals, int & t_targetID){
       std::cout << "\nSpecify the name of the receiving Terminal: ";
       std::string name;
