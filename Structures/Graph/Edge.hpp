@@ -5,6 +5,8 @@
 #ifndef EDGE_HPP
 #define EDGE_HPP
 
+#include <iostream>
+
 // Namespace enclosing
 namespace datastruct{
 

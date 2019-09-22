@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "../../Structures/LinkedList/LinkedList.hpp"
-
 using datastruct::LinkedList;
 
 // Namespace enclosing

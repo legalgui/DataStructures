@@ -5,6 +5,8 @@
 #ifndef BNODE_HPP
 #define BNODE_HPP
 
+#include <iostream>
+
 // Namespace enclosing
 namespace datastruct{
 

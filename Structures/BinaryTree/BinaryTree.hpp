@@ -8,7 +8,6 @@
 #include <iostream>
 
 #include "../BNode/BNode.hpp"
-
 using datastruct::BNode;
 
 // Namespace enclosing

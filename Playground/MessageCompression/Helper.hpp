@@ -5,12 +5,32 @@
 #ifndef HELPER_HPP
 #define HELPER_HPP
 
+#include <sstream>
+#include <iostream>
+
+#include "Terminal.hpp"
+#include "Symbol.hpp"
+#include "PriorityHandler.hpp"
+
+#include "../../Structures/LinkedList/LinkedList.hpp"
+using datastruct::LinkedList;
+
+#include "../../Structures/Stack/Stack.hpp"
+using datastruct::Stack;
+
+#include "../../Structures/BNode/BNode.hpp"
+using datastruct::BNode;
+
+#include "../../Structures/BinaryTree/BinaryTree.hpp"
+using datastruct::BinaryTree;
+
+
 // Namespace enclosing
 namespace huffmanutilities{
 
   // Structure for symbol code handling
   struct Table{
-    Table(char t_symbol, std::string t_code): symbol(t_symbol), code(t_code){}
+    Table(char t_symbol, std::string t_code): m_symbol(t_symbol), m_code(t_code){}
     char m_symbol;
     std::string m_code;
   };

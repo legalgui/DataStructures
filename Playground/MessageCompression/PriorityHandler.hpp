@@ -6,7 +6,6 @@
 #define PRIORITY_HANDLER_HPP
 
 #include "../../Structures/LinkedList/LinkedList.hpp"
-
 using datastruct::LinkedList;
 
 // Namespace enclosing
