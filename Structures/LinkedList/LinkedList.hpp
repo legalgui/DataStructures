@@ -170,13 +170,13 @@ namespace datastruct{
   }
 
   template <class T>
-  Node<T> * LinkedList<T>::remove(Node<T> *){
-    return nullptr;
+  Node<T> * LinkedList<T>::remove(Node<T> * t_node){
+    return remove(at(t_node));
   }
 
   template <class T>
   Node<T> * LinkedList<T>::remove(int t_position){
-    if(empty() || t_position >= m_size){
+    if(empty() || (t_position >= m_size || t_position < 0)){
       return nullptr;
     }
 
@@ -248,7 +248,7 @@ namespace datastruct{
     Node<T> * tmp { m_first };
 
     while(tmp != nullptr){
-      if(tmp->getInfo() == t_info){
+      if(*tmp->getInfo() == *t_info){
         found = true;
         break;
       }
@@ -262,8 +262,19 @@ namespace datastruct{
 
   template <class T>
   Node<T> * LinkedList<T>::searchAndReturnNode(const T & t_info){
-    int pos { searchAndReturnPosition(t_info) };
-    return remove(pos);
+    if (empty()){ return nullptr; }
+
+    Node<T> * node { nullptr };
+
+    Node<T> * tmp { m_first };
+
+    while (tmp != nullptr && node == nullptr){
+      if(*tmp->getInfo() == *t_info){
+        node = tmp;
+      }
+      tmp = tmp->getNext();
+    }
+    return node;
   }
 
   template <class T>
