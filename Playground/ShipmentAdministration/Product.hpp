@@ -24,6 +24,7 @@ namespace shipment{
     void setQuantity(const int);
     void addQuantity(const int);
 
+    void setPrice(const int);
     int getPrice() const;
 
 		inline bool operator<(const Product& t_product) const {
@@ -56,6 +57,10 @@ namespace shipment{
 
   void Product::addQuantity(const int t_quantity){
     m_quantity += t_quantity;
+  }
+
+  void Product::setPrice(const int t_price){
+    m_price = t_price;
   }
 
   int Product::getPrice() const{

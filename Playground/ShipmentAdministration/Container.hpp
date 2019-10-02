@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "Helper.hpp"
 #include "Product.hpp"
 #include "../../Structures/LinkedList/LinkedList.hpp"
 using datastruct::LinkedList;
@@ -23,15 +24,19 @@ namespace shipment{
   public:
     Container(std::string, int, bool);
 
-    Product * createProduct(const int);
-    std::string formatInput(std::string t_item);
-
     std::string getID() const;
     int getTotalPrice() const;
+
+    // Product handlers
+    Product * createProduct(const int);
     void addProducts(const int t_quantity);
-
     LinkedList<Product *> getProducts() const;
+    void handleSingle(Product * t_product);
+    void handleDuplicate(Product * t_product, Node<Product *> * t_found);
+    void handleNewPrice(Product * t_newProduct, Node<Product *> * t_oldProduct);
 
+
+    // Operator overloading
 		inline bool operator<(const Container& t_container) const {
 			return m_totalPrice < t_container.m_totalPrice;
 		}
@@ -50,53 +55,60 @@ namespace shipment{
 
   Container::Container(std::string t_id, int t_quantity, bool t_willAdd){
     m_id = t_id;
-    if(t_willAdd){
-        addProducts(t_quantity);
-    }
+    if(t_willAdd){ addProducts(t_quantity); }
   }
 
   void Container::addProducts(const int t_quantity){
     for(int i = 0; i < t_quantity; i++){
-      Product * product = createProduct(i);
-      auto found = m_products.searchAndReturnNode(product);
-      if(found){
-        std::cout << "Product already in container" << std::endl;
-        found->getInfo()->addQuantity(product->getQuantity());
-        int price = found->getInfo()->getPrice();
-        if(price != product->getPrice()){
-          std::cout << "The price is different from the stored one" << std::endl;
-          std::cout << "Update? (y/n)";
-          std::string update;
-          std::getline(std::cin, update);
-          update = formatInput(update);
-          if(update == "Y" || update == "YES"){
-            std::cout << "Price was updated!" << std::endl;
-          }else{
-            price = product->getPrice();
-          }
-          m_totalPrice += product->getQuantity() * price;
-        }
+      Product * newProduct { createProduct(i) };
+      auto oldProduct = m_products.searchAndReturnNode(newProduct);
+      if(!oldProduct){
+        handleSingle(newProduct);
       }else{
-        m_products.insertBack(product);
-        m_totalPrice += product->getQuantity() * product->getPrice();
+        handleDuplicate(newProduct, oldProduct);
       }
     }
   }
 
+  void Container::handleDuplicate(Product * t_newProduct, Node<Product *> * t_oldProduct){
+    std::cout << "Product already in container" << std::endl;
+
+    // Add quantity to old product registry
+    t_oldProduct->getInfo()->addQuantity(t_newProduct->getQuantity());
+
+    int price = t_oldProduct->getInfo()->getPrice();
+
+    if(price != t_newProduct->getPrice()){
+      handleNewPrice(t_newProduct, t_oldProduct);
+      price = t_oldProduct->getInfo()->getPrice();
+    }
+    m_totalPrice = t_oldProduct->getInfo()->getQuantity() * price;
+  }
+
+
+  void Container::handleNewPrice(Product * t_newProduct, Node<Product *> * t_oldProduct){
+    std::string label { "The price is different from the stored one\nUpdate? (y/n)" };
+    std::string update { shipmentutilities::promptUser(label, true) };
+    if(update == "Y" || update == "YES"){
+      std::cout << "Price was updated!" << std::endl;
+      t_oldProduct->getInfo()->setPrice(t_newProduct->getPrice());
+    }
+  }
+
+  void Container::handleSingle(Product * t_product){
+    m_products.insertBack(t_product);
+    m_totalPrice += t_product->getQuantity() * t_product->getPrice();
+  }
+
   Product * Container::createProduct(const int t_i){
-    std::cout << "Add the information for product " << t_i + 1 << std::endl;
-    std::cout << "\tContent: ";
-    std::string item;
-    std::getline(std::cin, item);
-    item = formatInput(item);
+    std::string label { "Add the information for product " + std::to_string(t_i + 1) + "\n\tContent: " };
+    std::string item { shipmentutilities::promptUser(label, true) };
 
-    std::cout << "\tQuantity: ";
-    std::string qString;
-    std::getline(std::cin, qString);
+    label = "\tQuantity: ";
+    std::string qString { shipmentutilities::promptUser(label, false) };
 
-    std::cout << "\tPrice: ";
-    std::string pString;
-    std::getline(std::cin, pString);
+    label = "\tPrice: ";
+    std::string pString { shipmentutilities::promptUser(label, false) };
 
     std::stringstream ss;
 
@@ -105,12 +117,6 @@ namespace shipment{
     ss >> quantity >> price;
     std::cout << std::endl;
     return new Product(item, quantity, price);
-  }
-
-  std::string Container::formatInput(std::string t_item){
-    std::for_each(t_item.begin(), t_item.end(), [](char & c) { c = ::toupper(c);});
-    t_item.erase(remove_if(t_item.begin(), t_item.end(), isspace), t_item.end());
-    return t_item;
   }
 
   std::string Container::getID() const{

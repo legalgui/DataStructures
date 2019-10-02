@@ -26,7 +26,7 @@ void printData(Giantint, Uint512, Uint512);
 
 // Function to create generator
 auto msm(Giantint t_seed) {
-    Giantint* currentResult = new Giantint(t_seed);
+    Giantint* currentResult { new Giantint(t_seed) };
 
     auto generator = [currentResult](bool stop = false)-> Giantint {
         if (stop) {
@@ -34,10 +34,10 @@ auto msm(Giantint t_seed) {
             return 0;
         }
 
-        Uint512 tremendouslyBig = *currentResult;
+        Uint512 tremendouslyBig { *currentResult };
         tremendouslyBig *= tremendouslyBig;
 
-        std::string str = boost::lexical_cast<std::string>(tremendouslyBig);
+        std::string str { boost::lexical_cast<std::string>(tremendouslyBig) };
         *currentResult = std::stoull(str.substr((str.size()/2-8), Specs::MIDDLE_SQUARE_SIZE));
 
         return *currentResult;
@@ -48,13 +48,13 @@ auto msm(Giantint t_seed) {
 int main() {
 
 	Uint512 all, valid = 0;
-	Giantint seed = 5186479483157648;
-  Giantint prueba = 4941330105954188;
+	Giantint seed { 5186479483157648 };
+  Giantint prueba { 4941330105954188 };
 
 	try {
-        auto generator = msm(seed);
+        auto generator { msm(seed) };
         std::set<Giantint> seen;
-        Giantint current = generator();
+        Giantint current { generator() };
 
         while(seen.find(current) == seen.end()) {
             if(isValid(current)){
@@ -86,27 +86,27 @@ void printData(Giantint seed, Uint512 all, Uint512 valid){
 
 // Function to verify if the card is valid
 bool isValid(Giantint t_generator){
-    std::string numberString = std::to_string(t_generator);
+    std::string numberString { std::to_string(t_generator) };
 
     if(numberString.size() != 16){ return 0; }
 
     std::vector<int> vec;
 
     for(int i = 0; i < numberString.size(); i++){
-        int number = numberString[i] - '0';
+        int number { numberString[i] - '0' };
 
         if(i%2 == 0){
             number *= 2;
             if(number > 9){
-                int units = number % 10;
-                int tenths = number / 10;
+                int units { number % 10 };
+                int tenths { number / 10 };
                 number = units + tenths;
             }
 
         }
         vec.push_back(number);
     }
-    int acum = 0;
+    int acum { 0 };
     for (auto& n : vec){ acum += n; }
     return acum%10 == 0;
 };
