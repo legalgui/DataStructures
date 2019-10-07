@@ -26,7 +26,7 @@ namespace datastruct{
     virtual ~Node();
 
     // Content accesors
-    T getInfo();
+    T getInfo() const;
     void setInfo(const T &);
 
     // Next element accesors
@@ -58,7 +58,7 @@ namespace datastruct{
   }
 
   template <class T>
-  T Node<T>::getInfo(){
+  T Node<T>::getInfo() const{
     return m_info;
   }
 

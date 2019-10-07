@@ -24,8 +24,8 @@ using namespace huffmanutilities::huffman;
 
 int main(){
   printHeader("COMMUNICATIONS SIMULATOR");
-  int selectedOpt = 1;
-  int terminalID = 0;
+  int selectedOpt { 1 };
+  int terminalID { 0 };
   int sessionID;
   LinkedList<Terminal *> terminals;
 
@@ -99,7 +99,7 @@ int main(){
                   // Get the compressed message
                   printHeader("COMPRESSED MESSAGE");
                   std::cout << "Original message: " << messageCopy << "\nCompressed message: ";
-                  std::string codeAux = getCompression(tables, messageCopy);
+                  std::string codeAux { getCompression(tables, messageCopy) };
                   std::cout << codeAux;
 
                   printSummary(codeAux, messageCopy);

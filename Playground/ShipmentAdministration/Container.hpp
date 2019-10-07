@@ -1,5 +1,5 @@
 // Sebastian Galguera
-// Product class for Shipment implementation
+// Container class for Shipment implementation
 
 // Guards
 #ifndef CONTAINER_HPP
@@ -19,10 +19,11 @@ namespace shipment{
 
     std::string m_id { "" };
     int m_totalPrice { 0 };
-    LinkedList<Product *> m_products;
+    LinkedList<Product *> * m_products { new LinkedList<Product *>() };
 
   public:
     Container(std::string, int, bool);
+    ~Container();
 
     std::string getID() const;
     int getTotalPrice() const;
@@ -30,7 +31,7 @@ namespace shipment{
     // Product handlers
     Product * createProduct(const int);
     void addProducts(const int t_quantity);
-    LinkedList<Product *> getProducts() const;
+    LinkedList<Product *> * getProducts() const;
     void handleSingle(Product * t_product);
     void handleDuplicate(Product * t_product, Node<Product *> * t_found);
     void handleNewPrice(Product * t_newProduct, Node<Product *> * t_oldProduct);
@@ -58,10 +59,14 @@ namespace shipment{
     if(t_willAdd){ addProducts(t_quantity); }
   }
 
+  Container::~Container(){
+    delete m_products;
+  }
+
   void Container::addProducts(const int t_quantity){
     for(int i = 0; i < t_quantity; i++){
       Product * newProduct { createProduct(i) };
-      auto oldProduct = m_products.searchAndReturnNode(newProduct);
+      auto oldProduct = m_products->searchAndReturnNode(newProduct);
       if(!oldProduct){
         handleSingle(newProduct);
       }else{
@@ -83,12 +88,13 @@ namespace shipment{
       price = t_oldProduct->getInfo()->getPrice();
     }
     m_totalPrice = t_oldProduct->getInfo()->getQuantity() * price;
+    delete t_newProduct;
   }
 
 
   void Container::handleNewPrice(Product * t_newProduct, Node<Product *> * t_oldProduct){
     std::string label { "The price is different from the stored one\nUpdate? (y/n)" };
-    std::string update { shipmentutilities::promptUser(label, true) };
+    std::string update { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", true) };
     if(update == "Y" || update == "YES"){
       std::cout << "Price was updated!" << std::endl;
       t_oldProduct->getInfo()->setPrice(t_newProduct->getPrice());
@@ -96,19 +102,19 @@ namespace shipment{
   }
 
   void Container::handleSingle(Product * t_product){
-    m_products.insertBack(t_product);
+    m_products->insertBack(t_product);
     m_totalPrice += t_product->getQuantity() * t_product->getPrice();
   }
 
   Product * Container::createProduct(const int t_i){
-    std::string label { "Add the information for product " + std::to_string(t_i + 1) + "\n\tContent: " };
-    std::string item { shipmentutilities::promptUser(label, true) };
+    std::string label { "\nAdd the information for product " + std::to_string(t_i + 1) + "\n\tContent: " };
+    std::string item { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", true) };
 
     label = "\tQuantity: ";
-    std::string qString { shipmentutilities::promptUser(label, false) };
+    std::string qString { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", false) };
 
     label = "\tPrice: ";
-    std::string pString { shipmentutilities::promptUser(label, false) };
+    std::string pString { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", false) };
 
     std::stringstream ss;
 
@@ -127,7 +133,7 @@ namespace shipment{
     return m_totalPrice;
   }
 
-  LinkedList<Product *> Container::getProducts() const{
+  LinkedList<Product *> * Container::getProducts() const{
     return m_products;
   }
 
@@ -136,8 +142,8 @@ namespace shipment{
     t_os << "\n\t" << "Container: " << t_container.getID() << " - total price: $" << t_container.getTotalPrice() << std::endl;
     t_os << "Items: " << "\n---------" << std::endl;
     auto products = t_container.getProducts();
-    for(int i = 0; i < products.size(); i++){
-      t_os << *products.at(i)->getInfo() << std::endl;
+    for(int i = 0; i < products->size(); i++){
+      t_os << *products->at(i)->getInfo() << std::endl;
     }
     return t_os;
   }

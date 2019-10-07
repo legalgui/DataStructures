@@ -242,7 +242,7 @@ namespace huffmanutilities{
     }
 
     // Function to get the huffman tree
-    BinaryTree<Symbol *>  getTree(PriorityHandler<BNode<Symbol *> *> & t_ph){
+    BinaryTree<Symbol *> getTree(PriorityHandler<BNode<Symbol *> *> & t_ph){
       while (t_ph.getList()->size()!=1){
 
           // Create left and right nodes

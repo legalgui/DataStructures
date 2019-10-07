@@ -9,14 +9,14 @@ using datastruct::Stack;
 
 int main(){
 
-  Stack<int> st;
-  st.push(1); // 0
-  st.push(2); // 1
-  st.push(3); // 2
-  st.push(4); // 3
+  Stack<int *> st;
+  st.push(new int(1)); // 0
+  st.push(new int(2)); // 1
+  st.push(new int(3)); // 2
+  st.push(new int(4)); // 3
 
   while(!st.empty()){
-    std::cout << *st.pop() << std::endl;
+    std::cout << *st.pop()->getInfo() << std::endl;
   }
 
   return 1;

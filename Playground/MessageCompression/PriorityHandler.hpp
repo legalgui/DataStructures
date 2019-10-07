@@ -15,7 +15,7 @@ namespace huffmanutilities{
   template <class T>
   class PriorityHandler{
 
-    LinkedList<T> * m_list = new LinkedList<T>();
+    LinkedList<T> * m_list { new LinkedList<T>() };
 
   public:
     PriorityHandler() {}
@@ -34,7 +34,7 @@ namespace huffmanutilities{
   // Class specifications
   template <class T>
   PriorityHandler<T>::~PriorityHandler(){
-    //m_list->clear();
+    delete m_list;
   };
 
   template <class T>
@@ -54,7 +54,7 @@ namespace huffmanutilities{
 
   template <class T>
   int PriorityHandler<T>::getPosition(T & t_element){
-    int position = 0;
+    int position { 0 };
     advance(position, t_element);
     return position;
   }
