@@ -22,8 +22,8 @@ namespace huffmanutilities{
 
   public:
 
-      LinkedList<std::string> * m_sentMsg = new LinkedList<std::string>();
-      LinkedList<std::string> * m_recievedMsg = new LinkedList<std::string>();
+      LinkedList<std::string *> * m_sentMsg = new LinkedList<std::string *>();
+      LinkedList<std::string *> * m_recievedMsg = new LinkedList<std::string *>();
 
       Terminal() {}
       Terminal(std::string t_name, std::string t_password, int t_ID) : m_name(t_name), m_password(t_password), m_ID(t_ID)  {}
@@ -35,13 +35,25 @@ namespace huffmanutilities{
       void setPassword(const std::string);
       std::string getPassword() const ;
 
-      void addReceived(const std::string);
-      LinkedList<std::string> * getReceived() const;
+      void addReceived(std::string *);
+      LinkedList<std::string *> * getReceived() const;
 
-      void addSent(const std::string);
-      LinkedList<std::string> * getSent() const;
+      void addSent(std::string *);
+      LinkedList<std::string *> * getSent() const;
 
       int getID() const;
+
+      inline bool operator<(const Terminal& t_terminal) const {
+  			return m_name == t_terminal.getName();
+  		}
+
+      inline bool operator>(const Terminal& t_terminal) const {
+  			return  m_name == t_terminal.getName();
+  		}
+
+      inline bool operator==(const Terminal& t_terminal) const {
+  			return m_name == t_terminal.getName();
+  		}
   };
 
   Terminal::~Terminal(){
@@ -65,19 +77,19 @@ namespace huffmanutilities{
     return m_password;
   };
 
-  void Terminal::addReceived(const std::string t_received){
+  void Terminal::addReceived(std::string * t_received){
     m_recievedMsg->insertBack(t_received);
   };
 
-  LinkedList<std::string> * Terminal::getReceived() const {
+  LinkedList<std::string *> * Terminal::getReceived() const {
     return m_recievedMsg;
   };
 
-  void Terminal::addSent(const std::string t_sent){
+  void Terminal::addSent(std::string * t_sent){
     m_sentMsg->insertBack(t_sent);
   };
 
-  LinkedList<std::string> * Terminal::getSent() const {
+  LinkedList<std::string *> * Terminal::getSent() const {
     return m_sentMsg;
   };
 

@@ -11,20 +11,21 @@ using datastruct::BinaryTree;
 #include "../../Structures/Stack/Stack.hpp"
 using datastruct::Stack;
 
-#include "PriorityHandler.hpp"
-#include "Symbol.hpp"
+#include "HuffmanCompressor.hpp"
+using huffmanutilities::HuffmanCompressor;
+
 #include "Terminal.hpp"
+using huffmanutilities::Terminal;
+
 #include "Helper.hpp"
-using namespace huffmanutilities;
 using namespace huffmanutilities::session;
 using namespace huffmanutilities::output;
 using namespace huffmanutilities::terminalhandling;
-using namespace huffmanutilities::huffman;
 
 
 int main(){
   printHeader("COMMUNICATIONS SIMULATOR");
-  int selectedOpt { 1 };
+  int selectedOpt { 1 };
   int terminalID { 0 };
   int sessionID;
   LinkedList<Terminal *> terminals;
@@ -75,37 +76,18 @@ int main(){
               case 1:{
                 // Message sending
                 int targetID { 0 };
-                bool connected = connect(terminals, targetID);
+                bool connected { connect(terminals, targetID) };
                 if(connected){
-                  LinkedList<BNode<Symbol *> *> symbolQueue;
-                  PriorityHandler<BNode<Symbol *> *> ph(&symbolQueue);
-                  std::string message, messageCopy;
-                  fillSymbolQueue(ph, message, messageCopy);
 
-                  // Create the frequency table
-                  printHeader("FREQUENCY TABLE");
-                  for(int i = 0; i < symbolQueue.size(); i++){
-                      std::cout << *symbolQueue.at(i)->getInfo()->getInfo() << std::endl;
-                  }
-
-                  // Tree construction
-                  printHeader("TREE CONSTRUCTION");
-                  BinaryTree<Symbol *> huffmanTree { getTree(ph) };
-
-                  // Get the conversion table
-                  printHeader("CONVERSION TABLE");
-                  LinkedList<Table *> tables { getTables(huffmanTree, message) };
+                  HuffmanCompressor hc;
+                  hc.compress("hola como estas", true);
 
                   // Get the compressed message
-                  printHeader("COMPRESSED MESSAGE");
-                  std::cout << "Original message: " << messageCopy << "\nCompressed message: ";
-                  std::string codeAux { getCompression(tables, messageCopy) };
-                  std::cout << codeAux;
-
-                  printSummary(codeAux, messageCopy);
-
-                  terminals.at(sessionID)->getInfo()->addSent(codeAux);
-                  terminals.at(targetID)->getInfo()->addReceived(codeAux);
+                  std::string compMsg = hc.getCompMsg();
+                  std::string msg = hc.getMsg();
+                  printSummary(compMsg, msg);
+                  terminals.at(sessionID)->getInfo()->addSent(&compMsg);
+                  terminals.at(targetID)->getInfo()->addReceived(&msg);
 
                 }else{
                   std::cout << "\nThe terminal does not exist." << std::endl;

@@ -15,12 +15,11 @@ namespace huffmanutilities{
   template <class T>
   class PriorityHandler{
 
-    LinkedList<T> * m_list { new LinkedList<T>() };
+    LinkedList<T> * m_list;
 
   public:
     PriorityHandler() {}
     PriorityHandler(LinkedList<T> * t_list) : m_list(t_list) {}
-    ~PriorityHandler();
 
     LinkedList<T> * getList();
     void insertOrdered(T);
@@ -29,12 +28,9 @@ namespace huffmanutilities{
     int getPosition(T &);
     void advance(int &, T &);
 
-  };
+    // Function to set list
+    void bind(LinkedList<T> * t_list);
 
-  // Class specifications
-  template <class T>
-  PriorityHandler<T>::~PriorityHandler(){
-    delete m_list;
   };
 
   template <class T>
@@ -64,6 +60,11 @@ namespace huffmanutilities{
     while(t_position < m_list->size() && (*t_element->getInfo() > *m_list->at(t_position)->getInfo()->getInfo())){
       ++t_position;
     }
+  }
+
+  template <class T>
+  void PriorityHandler<T>::bind(LinkedList<T> * t_list){
+    m_list = t_list;
   }
 
 }

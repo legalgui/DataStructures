@@ -33,6 +33,10 @@ namespace huffmanutilities{
     Table(char t_symbol, std::string t_code): m_symbol(t_symbol), m_code(t_code){}
     char m_symbol;
     std::string m_code;
+
+    inline bool operator==(const Table& t_table) const {
+      return m_symbol == t_table.m_symbol;
+    }
   };
 
 
@@ -194,10 +198,10 @@ namespace huffmanutilities{
 
         if(testTerminal->getSent()->size()){
 
-          std::string sError = testTerminal->getSent()->at(0)->getInfo();
+          std::string * sError = testTerminal->getSent()->at(0)->getInfo();
 
           // Case there was an error and the hamming code corrected it
-          if(hammingCode(sError)){
+          if(hammingCode(*sError)){
             std::cout << "The terminal " << testTerminal->getName() << " is not working properly." << std::endl;
             std::cout << "Shutting down..." << std::endl;
             t_terminals.remove(0);
@@ -211,137 +215,6 @@ namespace huffmanutilities{
       }else{
         std::cout << "\n There are no terminals yet." << std::endl;
       }
-    }
-  }
-
-  namespace huffman{
-
-    // Function to fill the symbol queue
-    void fillSymbolQueue(PriorityHandler<BNode<Symbol *> *> & t_ph,
-      std::string & t_msg, std::string & t_msgCpy){
-
-      std::cout << "Please, insert your message.\nMessage: ";
-      std::getline (std::cin,t_msg);
-      t_msgCpy = t_msg;
-
-      for (int i = 0; i < t_msg.size(); i++){
-        char auxChar = t_msg[i];
-        if (auxChar != '-'){
-          int charCount = 1;
-          for(int j = i+1; j < t_msg.size(); j++){
-            if(auxChar == t_msg[j]){
-              t_msg[j] = '-';
-              charCount++;
-            }
-          }
-          std::string auxLeafChar { auxChar };
-          BNode<Symbol *> *leafNode { new BNode<Symbol *>(new Symbol(auxLeafChar, charCount)) };
-          t_ph.insertOrdered(leafNode);
-        }
-      }
-    }
-
-    // Function to get the huffman tree
-    BinaryTree<Symbol *> getTree(PriorityHandler<BNode<Symbol *> *> & t_ph){
-      while (t_ph.getList()->size()!=1){
-
-          // Create left and right nodes
-          BNode<Symbol *> * left { t_ph.getList()->removeFront()->getInfo() };
-          left->getInfo()->setBinaryPath(0);
-          std::cout << "Left node " << *left->getInfo()  << std::endl;
-
-          BNode<Symbol *> * right { t_ph.getList()->removeFront()->getInfo() };
-          right->getInfo()->setBinaryPath(1);
-          std::cout << "Right node " << *right->getInfo() << std::endl;
-
-          // Create internal node
-          std::string internalSymbol { left->getInfo()->getSymbol() };
-
-          internalSymbol += right->getInfo()->getSymbol();
-
-          int internalFrequency { (left->getInfo()->getFrequency() + right->getInfo()->getFrequency()) };
-
-          BNode<Symbol *> * internal { new BNode<Symbol *>(new Symbol(internalSymbol, internalFrequency)) };
-          std::cout <<  "Internal node " << *internal->getInfo() << std::endl;
-
-          internal->setParent(NULL);
-
-          internal->setLeft(left);
-          left->setParent(internal);
-
-          internal->setRight(right);
-          right->setParent(internal);
-
-          t_ph.insertOrdered(internal);
-      }
-
-      BinaryTree<Symbol *> huffmanTree;
-      huffmanTree.setRoot(t_ph.getList()->removeFront()->getInfo());
-      return huffmanTree;
-    }
-
-    // Function to search specific BNode without in-class template specification
-    BNode<Symbol *> * searchHuffmanTree(Symbol * t_info, BNode<Symbol *> * t_root){
-      BNode<Symbol *> * foundNode { nullptr };
-      if(t_root){
-        if(*t_root->getInfo() == *t_info){
-          return t_root;
-        }else{
-          foundNode = searchHuffmanTree(t_info, t_root->getLeft());
-          if(foundNode){ return foundNode; }
-          return searchHuffmanTree(t_info, t_root->getRight());
-        }
-      }
-      return foundNode;
-    }
-
-    // Function to get the tables
-    LinkedList<Table *> getTables(BinaryTree<Symbol *> & t_huffmanTree, std::string t_msg){
-
-      LinkedList<Table *> tables;
-
-      for (int i = 0; i < t_msg.size(); i++){
-        if (t_msg[i] != '-'){
-          std::string auxString { t_msg[i] };
-          // Get the node for the given symbol
-          BNode<Symbol *> * auxBN { searchHuffmanTree(new Symbol(auxString, 0), t_huffmanTree.getRoot()) };
-
-          Stack<int> stackPath;
-          stackPath.push(auxBN->getInfo()->getBinaryPath());
-
-          // Traverse binary path to the top
-          while(auxBN->getParent() != t_huffmanTree.getRoot()){
-              stackPath.push(auxBN->getParent()->getInfo()->getBinaryPath());
-              auxBN = auxBN->getParent();
-          }
-
-          // Reverse the binary path by popping
-          std::string code;
-          while(!stackPath.empty()){
-              std::ostringstream convert;
-              convert << stackPath.pop()->getInfo();
-              code += convert.str();
-          }
-
-          std::cout << "Symbol " << t_msg[i] << " Code " << code << std::endl;
-          tables.insertBack(new Table(t_msg[i], code));;
-        }
-      }
-
-      return tables;
-    }
-
-    // Translate compression
-    std::string getCompression(LinkedList<Table *> & t_tables, std::string & t_msg){
-      std::string code;
-      for(int i = 0; i < t_msg.size(); i++){
-          for(int j = 0; j < t_tables.size(); j++){
-              if(t_msg[i] == t_tables.at(j)->getInfo()->m_symbol){
-                      code += t_tables.at(j)->getInfo()->m_code;
-              }
-          }
-      }
-      return code;
     }
   }
 
