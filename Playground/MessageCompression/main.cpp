@@ -1,16 +1,14 @@
 // Sebastian Galguera
 // Code to implement Message Compression System
 
-#include <sstream>
-
 #include <time.h>
 
-#include "../../Structures/BinaryTree/BinaryTree.hpp"
-using datastruct::BinaryTree;
+// General helpers
+#include "ConsoleUtilities.hpp"
+namespace input = consoleutilities::input;
+namespace output = consoleutilities::output;
 
-#include "../../Structures/Stack/Stack.hpp"
-using datastruct::Stack;
-
+// Problem specifics
 #include "HuffmanCompressor.hpp"
 using huffmanutilities::HuffmanCompressor;
 
@@ -18,13 +16,21 @@ using huffmanutilities::HuffmanCompressor;
 using huffmanutilities::Terminal;
 
 #include "Helper.hpp"
-using namespace huffmanutilities::session;
-using namespace huffmanutilities::output;
-using namespace huffmanutilities::terminalhandling;
+using huffmanutilities::Table;
 
+#include "TerminalUtilities.hpp"
+namespace session = huffmanutilities::terminalutilities::session;
+namespace handling = huffmanutilities::terminalutilities::handling;
+
+// Data structures
+#include "../../Structures/BinaryTree/BinaryTree.hpp"
+using datastruct::BinaryTree;
+
+#include "../../Structures/Stack/Stack.hpp"
+using datastruct::Stack;
 
 int main(){
-  printHeader("COMMUNICATIONS SIMULATOR");
+  output::printHeader("COMMUNICATIONS SIMULATOR");
   int selectedOpt { 1 };
   int terminalID { 0 };
   int sessionID;
@@ -32,100 +38,95 @@ int main(){
 
   while(selectedOpt != 0){
     // 0 for quitting
-    printHeader("MAIN MENU");
-    std::cin >> selectedOpt;
+    output::printHeader("MAIN MENU");
+    selectedOpt = input::promptUser<int>("Option:", 2, "Invalid Option");
 
     switch(selectedOpt){
 
       case 1:{
         // Admin section
         while(selectedOpt != 3){
-          printHeader("ADMIN MENU");
-          std::cin >> selectedOpt;
+          output::printHeader("ADMIN MENU");
+          selectedOpt = input::promptUser<int>("\nOption:", 3, "Invalid Option");
           switch(selectedOpt){
-            case 1:{
-              createTerminal(terminals, terminalID);
-              break;
-            }
-
-            case 2:{
-              terminalTest(terminals, terminalID);
-              break;
-            }
-
-            default:{
-              std::cout << "Invalid Option." << std::endl;
-              break;
-            }
+            case 1:{ handling::createTerminal(terminals, terminalID); break; }
+            case 2:{ handling::terminalTest(terminals, terminalID); break; }
           }
         }
         break;
       } // Admin section end
       case 2:{
-        printHeader("USER MENU");
-        bool loggedIn = login(terminals, sessionID);
+        output::printHeader("USER MENU");
+        bool loggedIn { session::login(terminals, sessionID) };
 
         if(loggedIn){
           while(selectedOpt != 4){
             // Terminal section
             std::cout << "\n Welcome to Terminal  " << terminals.at(sessionID)->getInfo()->getName() << std::endl;
-            printHeader("TERMINAL MENU");
-            std::cin >> selectedOpt;
+            output::printHeader("TERMINAL MENU");
+            selectedOpt = input::promptUser<int>("Option:", 4, "Invalid Option");
             switch(selectedOpt){
 
               case 1:{
                 // Message sending
                 int targetID { 0 };
-                bool connected { connect(terminals, targetID) };
+                bool connected { session::connect(terminals, targetID) };
                 if(connected){
 
                   HuffmanCompressor hc;
-                  hc.compress("hola como estas", true);
+
+                  std::string message {
+                    input::promptUser<std::string>("Message (min 2 different characters):", 15, "Invalid input, max(15)")
+                  };
+
+                  int verbose {
+                    input::promptUser<int>("Verbose? (0 = no, 1 = yes):", 1, "Invalid input, just 0 or 1")
+                  };
+
+                  hc.compress(message, verbose);
 
                   // Get the compressed message
                   std::string compMsg = hc.getCompMsg();
                   std::string msg = hc.getMsg();
-                  printSummary(compMsg, msg);
+                  output::printSummary(compMsg, msg);
                   terminals.at(sessionID)->getInfo()->addSent(&compMsg);
-                  terminals.at(targetID)->getInfo()->addReceived(&msg);
+                  terminals.at(targetID)->getInfo()->addReceived(&compMsg);
 
                 }else{
-                  std::cout << "\nThe terminal does not exist." << std::endl;
+                  output::printError("The terminal does not exist.");
                 }
                 break;
               } // End of message sending
 
               case 2:{
-                printHeader("SENT HISTORY");
+                output::printHeader("SENT HISTORY");
                 if(terminals.at(sessionID)->getInfo()->getSent()->size()){
                   std::cout << *terminals.at(sessionID)->getInfo()->getSent() << std::endl;
                 }else{
-                    std::cout << "No messages have been sent." << std::endl;
+                  std::cout << "There are no sent messages yet." << std::endl;
                 }
                 break;
               }
 
               case 3:{
-                printHeader("RECEIVED HISTORY");
+                output::printHeader("RECEIVED HISTORY");
                 if(terminals.at(sessionID)->getInfo()->getReceived()->size()){
                   std::cout << *terminals.at(sessionID)->getInfo()->getReceived() << std::endl;
                 }else{
-                    std::cout << "No messages have been received." << std::endl;
+                  std::cout << "There are no received messages yet." << std::endl;
                 }
                 break;
               }
-              default:{ break; }
             } // End of nested switch
           }
         }else{
-          std::cout << "Login information contains errors.\n" << std::endl;
+          output::printError("Login information contains errors.");
         }
         break;
       }case 0:{
         std::cout << "Goodbye " << std::endl;
         break;
       }
-      default:{ std::cout << "Invalid option\n"; }
     } // End of outer switch
   } // End of while
 }

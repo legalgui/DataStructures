@@ -6,19 +6,22 @@
 #define DOCK_HPP
 
 #include <iostream>
-#include <sstream>
 
-#include "Helper.hpp"
-#include "Product.hpp"
+// General helpers
+#include "ConsoleUtilities.hpp"
+using namespace consoleutilities;
+namespace input = consoleutilities::input;
+namespace output = consoleutilities::output;
+
+// Problem specific
 #include "Container.hpp"
 
+// Data structures
 #include "../../Structures/Stack/Stack.hpp"
 using datastruct::Stack;
 
 #include "../../Structures/LinkedList/LinkedList.hpp"
 using datastruct::LinkedList;
-
-namespace utils = shipmentutilities;
 
 // Namespace enclosing
 namespace shipment{
@@ -73,7 +76,7 @@ namespace shipment{
       std::cout << "Stack is full, starting new stack" << std::endl;
       addStackAndProduct(t_numProducts, t_willAdd);
     }else {
-      utils::printError("The dock is full");
+      output::printError("The dock is full");
     }
   }
 

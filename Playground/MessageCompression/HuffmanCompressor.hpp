@@ -5,22 +5,30 @@
 #ifndef HUFFMAN_COMPRESSOR_HPP
 #define HUFFMAN_COMPRESSOR_HPP
 
+// General helpers
+#include "ConsoleUtilities.hpp"
+using namespace consoleutilities;
+namespace input = consoleutilities::input;
+namespace output = consoleutilities::output;
+
+// Problem specifics
+#include "PriorityHandler.hpp"
+#include "Symbol.hpp"
+#include "Terminal.hpp"
+#include "Helper.hpp"
+
+// Data structures
 #include "../../Structures/LinkedList/LinkedList.hpp"
 using datastruct::LinkedList;
 
-#include "PriorityHandler.hpp"
-using huffmanutilities::PriorityHandler;
+#include "../../Structures/BNode/BNode.hpp"
+using datastruct::BNode;
 
-#include "Symbol.hpp"
-using huffmanutilities::Symbol;
+#include "../../Structures/BinaryTree/BinaryTree.hpp"
+using datastruct::BinaryTree;
 
-#include "Terminal.hpp"
-using huffmanutilities::Terminal;
-
-#include "Helper.hpp"
-using huffmanutilities::Table;
-using namespace huffmanutilities::output;
-
+#include "../../Structures/Stack/Stack.hpp"
+using datastruct::Stack;
 
 // Namespace enclosing
 namespace huffmanutilities{
@@ -53,13 +61,12 @@ namespace huffmanutilities{
 
     // Tree utility functions
     BNode<Symbol *> * createNode(std::string, int, bool);
-    BNode<Symbol *> * searchHuffmanTree(Symbol *, BNode<Symbol *> *);
 
     // Process functions
-    void fillSymbolQueue(const char);
+    void buildSymbolQueue(const char);
     void printFrequencyTable();
     void buildTree(bool);
-    void buildTables(const char, bool);
+    void buildTables(const char, const bool);
     void buildCompression(bool);
 
   };
@@ -79,21 +86,21 @@ namespace huffmanutilities{
 
   void HuffmanCompressor::run(bool t_isVerbose){
     m_ph.bind(&m_symbolQueue);
-    fillSymbolQueue('-');
-    if(t_isVerbose){
-      printFrequencyTable();
-    }
+    buildSymbolQueue('<');
+    if(t_isVerbose){ printFrequencyTable(); }
     buildTree(t_isVerbose);
-    buildTables('-', t_isVerbose);
+    buildTables('<', t_isVerbose);
     buildCompression(t_isVerbose);
   };
 
   // Function to fill the symbol queue
-  void HuffmanCompressor::fillSymbolQueue(const char t_special){
-    for (int i = 0; i < m_msgCpy.size(); i++){
-      char auxChar = m_msgCpy[i];
-      if (auxChar != t_special){
-        int charCount = 1;
+  void HuffmanCompressor::buildSymbolQueue(const char t_special){
+    char auxChar;
+    int charCount;
+    for(int i = 0; i < m_msgCpy.size(); i++){
+      auxChar = m_msgCpy[i];
+      if(auxChar != t_special){
+        charCount = 1;
         for(int j = i+1; j < m_msgCpy.size(); j++){
           if(auxChar == m_msgCpy[j]){
             m_msgCpy[j] = t_special;
@@ -109,7 +116,7 @@ namespace huffmanutilities{
 
   void HuffmanCompressor::printFrequencyTable(){
     // Create the frequency table
-    printHeader("FREQUENCY TABLE");
+    output::printHeader("FREQUENCY TABLE");
     for(int i = 0; i < m_symbolQueue.size(); i++){
         std::cout << *m_symbolQueue.at(i)->getInfo()->getInfo() << std::endl;
     }
@@ -128,7 +135,7 @@ namespace huffmanutilities{
   // Function to get the huffman tree
   void HuffmanCompressor::buildTree(bool t_isVerbose){
     if(t_isVerbose){
-      printHeader("TREE CONSTRUCTION");
+      output::printHeader("TREE CONSTRUCTION");
     }
     while (m_ph.getList()->size()!=1){
 
@@ -161,9 +168,9 @@ namespace huffmanutilities{
   }
 
   // Function to get the tables
-  void HuffmanCompressor::buildTables(const char t_special, bool t_isVerbose){
+  void HuffmanCompressor::buildTables(const char t_special, const bool t_isVerbose){
     if(t_isVerbose){
-      printHeader("CONVERSION TABLE");
+      output::printHeader("CONVERSION TABLE");
     }
 
     for (int i = 0; i < m_msgCpy.size(); i++){
@@ -171,7 +178,7 @@ namespace huffmanutilities{
         std::string auxString { m_msgCpy[i] };
 
         // Get the node for the given symbol
-        BNode<Symbol *> * auxBN { searchHuffmanTree(new Symbol(auxString, 0), m_huffmanTree.getRoot()) };
+        BNode<Symbol *> * auxBN { m_huffmanTree.search(new Symbol(auxString, 0), m_huffmanTree.getRoot()) };
 
         Stack<int *> stackPath;
         stackPath.push(new int(auxBN->getInfo()->getBinaryPath()));
@@ -199,21 +206,6 @@ namespace huffmanutilities{
 
   }
 
-  // Function to search specific BNode without in-class template specification
-  BNode<Symbol *> * HuffmanCompressor::searchHuffmanTree(Symbol * t_info, BNode<Symbol *> * t_root){
-    BNode<Symbol *> * foundNode { nullptr };
-    if(t_root){
-      if(*t_root->getInfo() == *t_info){
-        return t_root;
-      }else{
-        foundNode = searchHuffmanTree(t_info, t_root->getLeft());
-        if(foundNode){ return foundNode; }
-        return searchHuffmanTree(t_info, t_root->getRight());
-      }
-    }
-    return foundNode;
-  }
-
   // Translate compression
   void HuffmanCompressor::buildCompression(bool t_isVerbose){
     for(int i = 0; i < m_msg.size(); i++){
@@ -225,7 +217,7 @@ namespace huffmanutilities{
     }
 
     if(t_isVerbose){
-      printHeader("COMPRESSED MESSAGE");
+      output::printHeader("COMPRESSED MESSAGE");
       std::cout << "Original message: " << m_msg << "\nCompressed message: ";
       std::cout << m_compressedMsg << std::endl;
     }

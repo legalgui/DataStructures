@@ -8,8 +8,15 @@
 #include <iostream>
 #include <sstream>
 
-#include "Helper.hpp"
+// General helpers
+#include "ConsoleUtilities.hpp"
+namespace input = consoleutilities::input;
+namespace output = consoleutilities::output;
+
+// Problem specific
 #include "Product.hpp"
+
+// Data structures
 #include "../../Structures/LinkedList/LinkedList.hpp"
 using datastruct::LinkedList;
 
@@ -94,7 +101,7 @@ namespace shipment{
 
   void Container::handleNewPrice(Product * t_newProduct, Node<Product *> * t_oldProduct){
     std::string label { "The price is different from the stored one\nUpdate? (y/n)" };
-    std::string update { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", true) };
+    std::string update { input::promptUser<std::string>(label, 20, "Invalid", true) };
     if(update == "Y" || update == "YES"){
       std::cout << "Price was updated!" << std::endl;
       t_oldProduct->getInfo()->setPrice(t_newProduct->getPrice());
@@ -108,13 +115,13 @@ namespace shipment{
 
   Product * Container::createProduct(const int t_i){
     std::string label { "\nAdd the information for product " + std::to_string(t_i + 1) + "\n\tContent: " };
-    std::string item { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", true) };
+    std::string item { input::promptUser<std::string>(label, 20, "Invalid", true) };
 
     label = "\tQuantity: ";
-    std::string qString { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", false) };
+    std::string qString { input::promptUser<std::string>(label, 20, "Invalid", false) };
 
     label = "\tPrice: ";
-    std::string pString { shipmentutilities::getValidPrompt<std::string>(label, 20, "Invalid", false) };
+    std::string pString { input::promptUser<std::string>(label, 20, "Invalid", false) };
 
     std::stringstream ss;
 
