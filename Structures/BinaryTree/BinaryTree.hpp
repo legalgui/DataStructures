@@ -155,7 +155,7 @@ namespace datastruct{
   template <class T>
   void BinaryTree<T>::preOrder(BNode<T> * t_node) const{
     if(t_node){
-      std::cout << *t_node << " ";
+      std::cout << *t_node->getInfo() << " ";
       preOrder(t_node->getLeft());
       preOrder(t_node->getRight());
     }
@@ -170,7 +170,7 @@ namespace datastruct{
   void BinaryTree<T>::inOrder(BNode<T> * t_node) const{
     if(t_node){
       inOrder(t_node->getLeft());
-      std::cout << *t_node << " ";
+      std::cout << *t_node->getInfo() << " ";
       inOrder(t_node->getRight());
     }
   };
@@ -185,7 +185,7 @@ namespace datastruct{
     if(t_node){
       postOrder(t_node->getLeft());
       postOrder(t_node->getRight());
-      std::cout << *t_node << " ";
+      std::cout << *t_node->getInfo() << " ";
     }
   };
 
@@ -198,7 +198,7 @@ namespace datastruct{
   void BinaryTree<T>::isLeaf(BNode<T> * t_node) const{
     if(t_node){
       if(!t_node->getLeft() && !t_node->getRight()){
-        std::cout << *t_node << " ";
+        std::cout << *t_node->getInfo() << " ";
       }else{
         isLeaf(t_node->getLeft());
         isLeaf(t_node->getRight());
@@ -224,7 +224,7 @@ namespace datastruct{
   template <class T>
   void BinaryTree<T>::ancestors(BNode<T> * t_node) const{
     if(t_node && t_node->getParent()){
-      std::cout << *t_node->getParent() << " ";
+      std::cout << *t_node->getParent()->getInfo() << " ";
       ancestors(t_node->getParent());
     }
   };
@@ -234,7 +234,7 @@ namespace datastruct{
     if(t_root){
       if(getDepth(t_node) == getDepth(t_root) &&
       validateSiblings(t_node->getParent(), t_root->getParent())){
-        std::cout << *t_root << " ";
+        std::cout << *t_root->getInfo() << " ";
       }
       cousins(t_node, t_root->getLeft());
       cousins(t_node, t_root->getRight());
@@ -252,9 +252,9 @@ namespace datastruct{
   void BinaryTree<T>::siblings(BNode<T> * t_node) const{
     if(t_node){
       if(t_node->getParent()->getLeft() == t_node){
-        std::cout << *t_node->getParent()->getRight() << " ";
+        std::cout << *t_node->getParent()->getRight()->getInfo() << " ";
       }else{
-        std::cout << *t_node->getParent()->getLeft() << " ";
+        std::cout << *t_node->getParent()->getLeft()->getInfo() << " ";
       }
     }
     return;
@@ -277,7 +277,7 @@ namespace datastruct{
   BNode<T> * BinaryTree<T>::search(T t_info, BNode<T> * t_root){
     BNode<T> * foundNode { nullptr };
     if(t_root){
-      if(t_root->getInfo() == t_info){
+      if(*t_root->getInfo() == *t_info){
         return t_root;
       }else{
         foundNode = search(t_info, t_root->getLeft());
@@ -305,13 +305,13 @@ namespace datastruct{
 
   template <class T>
   T BinaryTree<T>::sumNodes(BNode<T> * t_node){
-    static T value;
+    static int value;
     if(t_node){
-      value += t_node->getInfo();
+      value += *t_node->getInfo();
       sumNodes(t_node->getLeft());
       sumNodes(t_node->getRight());
     }
-    return value;
+    return &value;
   };
 
   template <class T>

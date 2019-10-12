@@ -86,7 +86,7 @@ namespace datastruct{
   template <typename T>
   std::ostream & operator<<(std::ostream & t_os, const Queue<T> & t_queue){
     for (const Node<T> & node : t_queue) {
-      t_os << node << std::endl;
+      t_os << *node.getInfo() << std::endl;
     }
     return t_os;
   }

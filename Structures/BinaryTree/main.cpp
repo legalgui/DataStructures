@@ -19,16 +19,16 @@ namespace bttestdata{
 };
 
 typedef bttestdata::Specs Specs;
-typedef std::array<BNode<int> *, Specs::NELEMENTS> BPTRArray;
+typedef std::array<BNode<int *> *, Specs::NELEMENTS> BPTRArray;
 
-bool ensembleTree(BPTRArray &, BinaryTree<int> &);
+bool ensembleTree(BPTRArray &, BinaryTree<int *> &);
 void initBPTRArray(BPTRArray &);
 
 int main(){
 
   // Array of pointers to BNodes
   BPTRArray nodes;
-  BinaryTree<int> btree;
+  BinaryTree<int *> btree;
 
   initBPTRArray(nodes);
   ensembleTree(nodes, btree);
@@ -72,16 +72,20 @@ int main(){
   std::cout << "\n" << std::endl;
 
   std::cout << "SUM NODES" << std::endl;
-  std::cout << btree.sumNodes(nodes[0]);
+  std::cout << *btree.sumNodes(nodes[0]);
   std::cout << "\n" << std::endl;
 
   std::cout << "SEARCH FOR NODE" << std::endl;
-  BNode<int> * found = btree.search(7);
-  if(found){ std::cout << *found; }
+  int * iPtr { new int(7) };
+  BNode<int *> * found = btree.search(iPtr);
+  delete iPtr;
+  if(found){ std::cout << *found->getInfo(); }
   std::cout << "\n" << std::endl;
 
   std::cout << "CHECK IF VALUE IS IN TREE" << std::endl;
-  std::cout << btree.exists(1);
+  iPtr = new int(1);
+  std::cout << btree.exists(iPtr);
+  delete iPtr;
   std::cout << "\n" << std::endl;
 
   std::cout << "INVERTING TREE" << std::endl;
@@ -93,7 +97,7 @@ int main(){
 }
 
 // Function to ensemble tree from list 1 - 15
-bool ensembleTree(BPTRArray & t_nodes, BinaryTree<int> & t_btree){
+bool ensembleTree(BPTRArray & t_nodes, BinaryTree<int *> & t_btree){
 
   t_btree.setRoot(t_nodes[0]);
   int inserted = 0;
@@ -109,6 +113,6 @@ bool ensembleTree(BPTRArray & t_nodes, BinaryTree<int> & t_btree){
 // Function to initialize the BNode pointers array
 void initBPTRArray(BPTRArray & t_nodes){
   for(auto i = 0; i < t_nodes.size(); i++){
-    t_nodes[i] = new BNode<int>(i + 1);
+    t_nodes[i] = new BNode<int *>(new int(i + 1));
   }
 }

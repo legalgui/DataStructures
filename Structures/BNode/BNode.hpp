@@ -41,6 +41,11 @@ namespace datastruct{
     void setRight(BNode<T> *);
 
     template <typename Tn>
+    inline bool operator==(const BNode<Tn>& t_node) const {
+      return m_info == t_node.getInfo();
+    }
+
+    template <typename Tn>
     friend std::ostream & operator<<(std::ostream &, const BNode<Tn>  &);
   };
 

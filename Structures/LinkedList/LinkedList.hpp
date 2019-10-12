@@ -268,7 +268,7 @@ namespace datastruct{
 
     Node<T> * tmp { m_first };
 
-    while (tmp != nullptr && node == nullptr){
+    while(tmp != nullptr && node == nullptr){
       if(*tmp->getInfo() == *t_info){
         node = tmp;
       }
@@ -284,8 +284,8 @@ namespace datastruct{
 
   template <class Tn>
   std::ostream & operator<<(std::ostream & t_os, const LinkedList<Tn> & t_linkedList){
-    for (const Node<Tn> & node : t_linkedList ){
-      t_os << node << std::endl;
+    for(const Node<Tn> & node : t_linkedList){
+      t_os << *node.getInfo() << std::endl;
     }
     return t_os;
   }
