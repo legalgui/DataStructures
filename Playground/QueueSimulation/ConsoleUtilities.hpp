@@ -21,10 +21,10 @@ namespace consoleutilities{
     }
 
     void printTime(int t_time){
-      if((t_time%60) == 0){
-        std::cout << t_time/60 << ":0" << t_time%60 << std::endl;
+      if((t_time % 60) <= 9){
+        std::cout << t_time / 60 << ":0" << t_time % 60 << std::endl;
       }else{
-        std::cout << t_time/60 << ":" << t_time%60 << std::endl;
+        std::cout << t_time / 60 << ":" << t_time % 60 << std::endl;
       }
     }
 

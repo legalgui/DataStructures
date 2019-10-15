@@ -30,7 +30,7 @@ namespace huffmanutilities{
     void advance(int &, T &);
 
     // Function to set list
-    void bind(LinkedList<T> * t_list);
+    void bind(LinkedList<T> *);
 
   };
 
@@ -44,7 +44,7 @@ namespace huffmanutilities{
     if(m_list->empty()){
       m_list->insertBack(t_element);
     }else{
-      int position = getPosition(t_element);
+      int position { getPosition(t_element) };
       m_list->insert(t_element, position);
     }
   }

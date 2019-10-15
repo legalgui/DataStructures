@@ -55,10 +55,9 @@ namespace queuesimulationutilities{
       void setLockedEvents(const double);
       double getLockedEvents() const;
 
-      void setTimeWastedInQueue(const double);
       double getTimeWastedInQueue() const;
 
-      void setTimeWastedByStaff(const double);
+      void setTimeWastedByStaff(const Event *);
       double getTimeWastedByStaff() const;
 
       inline bool operator==(const Event& t_event) const {
@@ -120,16 +119,12 @@ namespace queuesimulationutilities{
     return m_lockedEvents;
   };
 
-  void Event::setTimeWastedInQueue(const double t_timeWastedInQueue){
-    m_timeWastedInQueue = t_timeWastedInQueue;
-  };
-
   double Event::getTimeWastedInQueue() const{
-    return m_timeWastedInQueue;
+    return (m_timeOfEventStart - m_timeOfArrival);
   };
 
-  void Event::setTimeWastedByStaff(const double t_timeWastedByStaff){
-    m_timeWastedByStaff = t_timeWastedByStaff;
+  void Event::setTimeWastedByStaff(const Event * t_previous){
+    m_timeWastedByStaff = (m_timeOfEventStart - t_previous->getTimeOfEventEnd());
   };
 
   double Event::getTimeWastedByStaff() const{

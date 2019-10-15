@@ -7,11 +7,15 @@
 #include "ConsoleUtilities.hpp"
 namespace output = consoleutilities::output;
 
+// Problem specifics
+#include "PriorityHandler.hpp"
+using queuesimulationutilities::PriorityHandler;
+
 #include "Event.hpp"
 using queuesimulationutilities::Event;
 
 #include "Probabilities.hpp"
-namespace probs = probabilities;
+namespace probs = queuesimulationutilities::probabilities;
 
 // Data structures
 #include "../../Structures/Queue/Queue.hpp"
@@ -24,104 +28,95 @@ namespace queuesimulationdata{
     static constexpr int NUMBER_OF_TRUCKS { 16 };
     static constexpr int TIME_OF_START { 660 };
     static constexpr int TIME_OF_END { 1260 };
-    static constexpr int TIME_INTERVAL { 5 };
+    static constexpr double TIME_INTERVAL { 1 };
 
     static constexpr double COST_PER_PERSON_EXTRA_TIME { 37.5 };
     static constexpr double COST_PER_PERSON_NORMAL_TIME { 25.0 };
-    static constexpr double COST_PER_TRUCK_IN_QUEUE { 100.0 };
+    static constexpr double COST_PER_TRUCK_IN_QUEUE { 50.0 };
     static constexpr double COST_PER_HOUR_OF_WAREHOUSE { 500.0 };
     static constexpr int NUMBER_OF_PEOPLE { 4 };
-
+    static int id;
   };
 };
 
-int id = 0;
 typedef queuesimulationdata::Specs Specs;
+int Specs::id {0};
 
 void nextStep(double &, double &, double &);
+void printCosts(const double &, const double &);
 
 int main(){
-  output::printHeader("COMMUNICATIONS SIMULATOR");
-  // CATCHING THE SYSTEM MACROS
-  int numberOfTrucks = Specs::NUMBER_OF_TRUCKS;
-  int timeOfStart = Specs::TIME_OF_START;
-  int timeOfEnd = Specs::TIME_OF_END;
-  int timeInterval = Specs::TIME_INTERVAL;
+  output::printHeader("QUEUE SIMULATOR");
 
-  // FLAGS
-  bool hourOfArrivalHasPassed = 1;
-  bool hadLunch = 0;
-  bool emergency = 0;
+  // Flags
+  bool hourOfArrivalHasPassed { true };
+  bool hadLunch { false };
 
-  // COUNTERS
-  double limitCount = 0;
+  // Counters
+  double limitCount { 0 };
 
-  // SPECIFIERS
-  double nextArrival = 0;
-  double hourOfNextArrival = 660;
-  double durationOfEvent = 0;
+  // Specifiers
+  double nextArrival { 0 };
+  double hourOfNextArrival { 660 };
+  double durationOfEvent { 0 };
 
-  // ACCUMULATORS
-  double timeWastedInQueue = 0;
-  double timeWastedByStaff = 0;
+  // Accumulators
+  double timeWastedInQueue { 0 };
+  double timeWastedByStaff { 0 };
 
-  // OUR BAY
-  Queue<Event *> * bay = new Queue<Event *>;
+  // Bay
+  Queue<Event *> * bay { new Queue<Event *>() };
+  PriorityHandler<Event *> ph(bay);
 
-  // INITIAL CONDITIONS
-  Event * e = new Event("First case", id);
+  // First event
+  Event * e { new Event("First case", Specs::id++) };
   e->setTimeOfArrival(660);
   e->setDuration(20);
-  bay->enqueue(e);
+  ph.syncEnqueue(e);
 
-  // START DAY
-  for(int clock = timeOfStart; clock < timeOfEnd; clock += timeInterval){
-    // GENERAL TIME OF THE DAY
-    std::cout << "Current time : ";
+  // Start 11:00 AM
+  for(int clock = Specs::TIME_OF_START; clock < Specs::TIME_OF_END; clock += Specs::TIME_INTERVAL){
+    std::cout << "Current time: ";
     output::printTime(clock);
 
-    // DEQUEUING CONDITIONS
     if(!bay->empty()){
-      // IF THE TIME OF DEQUEUING HAS COME
       if(clock == bay->front()->getInfo()->getTimeOfEventEnd()){
-        // DON'T PENALIZE QUEUE OR STAFF FOR LUNCH
+        // Penalize everything but lunch time
         if(!(bay->front()->getInfo()->getEventType() == "Lunch")){
           timeWastedInQueue += bay->front()->getInfo()->getTimeWastedInQueue();
           timeWastedByStaff += bay->front()->getInfo()->getTimeWastedByStaff();
         }
-        std::cout << "EXITS " << std::endl;
-        std::cout << bay->dequeue()->getInfo() << std::endl;
-        std::cout << "SIZE OF QUEUE " << bay->size() << std::endl;
+        std::cout << "Exits" << std::endl;
+        std::cout << *bay->dequeue()->getInfo() << std::endl;
+        std::cout << "Number of events in queue: " << bay->size() << std::endl;
       }
     }
 
-    // TRIGGERING A NEW TIME OF ARRIVAL AND DURATION
+    // Getting the next arrival
     if(hourOfArrivalHasPassed){
       nextStep(nextArrival, hourOfNextArrival, durationOfEvent);
-      hourOfArrivalHasPassed = 0;
+      hourOfArrivalHasPassed = false;
     }
 
-    // INJECTING A SPECIAL EVENT
+    // Lunch special case
     if(clock >= 900 && !hadLunch){
-      Event * e = new Event("Lunch", id++);
-      e->setTimeOfArrival(900);
+      Event * e { new Event("Lunch", 0) };
+      e->setTimeOfArrival(860);
       e->setDuration(30);
-      bay->enqueue(e);
-      id--;
-      std::cout << "ENTERS " << std::endl;
+      ph.syncEnqueue(e);
+      std::cout << "Enters " << std::endl;
       std::cout << *e << std::endl;
-      hadLunch = 1;
+      hadLunch = true;
     }
 
-     // IF THE CLOCK REACHES THE TIME OF ARRIVAL
-     if(clock == hourOfNextArrival && limitCount < numberOfTrucks){
-       Event * e = new Event("Truck Event", ++id);
+     if(clock == hourOfNextArrival && limitCount < Specs::NUMBER_OF_TRUCKS){
+       Event * e { new Event("Truck Event", Specs::id++) };
        e->setTimeOfArrival(hourOfNextArrival);
        e->setDuration(durationOfEvent);
-       bay->enqueue(e);
+       ph.syncEnqueue(e);
        std::cout << "ENTERS " << std::endl;
        std::cout << *e << std::endl;
-       hourOfArrivalHasPassed = 1;
+       hourOfArrivalHasPassed = true;
        limitCount++;
      }
 
@@ -139,31 +134,34 @@ int main(){
  double activeHours = (Specs::TIME_OF_END - Specs::TIME_OF_START)/60;
 
  // PRINTING THE COSTS AND TOTAL
- std::cout << "Cost of warehouse active hours: " << "$" <<
- (activeHours * Specs::COST_PER_HOUR_OF_WAREHOUSE) << std::endl;
+ printCosts(activeHours, timeWastedInQueue);
 
- std::cout << "Cost of personnel normal hours: " << "$" <<
- (activeHours * Specs::COST_PER_PERSON_NORMAL_TIME*Specs::NUMBER_OF_PEOPLE) << std::endl;
-
- std::cout << "Cost of personnel extra houss: " << "$" <<
- (0 * Specs::COST_PER_PERSON_EXTRA_TIME * Specs::NUMBER_OF_PEOPLE) << std::endl;
-
- std::cout << "Cost of trucks waiting in queue: " << "$" <<
- (timeWastedInQueue/60 * Specs::COST_PER_TRUCK_IN_QUEUE) << std::endl;
-
- std::cout << "Total: " << "$" << (activeHours * Specs::COST_PER_HOUR_OF_WAREHOUSE +
- activeHours * Specs::COST_PER_PERSON_NORMAL_TIME * Specs::NUMBER_OF_PEOPLE +
- 0 * Specs::COST_PER_PERSON_EXTRA_TIME * Specs::NUMBER_OF_PEOPLE +
- timeWastedInQueue/60 * Specs::COST_PER_TRUCK_IN_QUEUE) << std::endl;
-
-
+ delete bay;
  return 0;
 }
 
+void printCosts(const double &activeHours, const double &timeWastedInQueue){
+  std::cout << "Cost of warehouse active hours: " << "$" <<
+  (activeHours * Specs::COST_PER_HOUR_OF_WAREHOUSE) << std::endl;
+
+  std::cout << "Cost of personnel normal hours: " << "$" <<
+  (activeHours * Specs::COST_PER_PERSON_NORMAL_TIME*Specs::NUMBER_OF_PEOPLE) << std::endl;
+
+  std::cout << "Cost of personnel extra houss: " << "$" <<
+  (0 * Specs::COST_PER_PERSON_EXTRA_TIME * Specs::NUMBER_OF_PEOPLE) << std::endl;
+
+  std::cout << "Cost of trucks waiting in queue: " << "$" <<
+  (timeWastedInQueue/60 * Specs::COST_PER_TRUCK_IN_QUEUE) << std::endl;
+
+  std::cout << "Total: " << "$" << (activeHours * Specs::COST_PER_HOUR_OF_WAREHOUSE +
+  activeHours * Specs::COST_PER_PERSON_NORMAL_TIME * Specs::NUMBER_OF_PEOPLE +
+  0 * Specs::COST_PER_PERSON_EXTRA_TIME * Specs::NUMBER_OF_PEOPLE +
+  timeWastedInQueue/60 * Specs::COST_PER_TRUCK_IN_QUEUE) << std::endl;
+}
 
 // Function to simulate time
-void nextStep(double &nextArrival, double &hourOfNextArrival, double &durationOfEvent){
-    nextArrival = probs::timeOfNextArrival(probs::probsOfArrival4[id+1]);
+void nextStep(double &nextArrival, double &hourOfNextArrival, double &duration){
+    nextArrival = probs::timeOfNextArrival(probs::probsOfArrival4[Specs::id+1]);
     hourOfNextArrival += nextArrival;
-    durationOfEvent = probs::getServTime4(probs::probServiceTime4[id+1]);
+    duration = probs::getServTime4(probs::probServiceTime4[Specs::id+1]);
 };

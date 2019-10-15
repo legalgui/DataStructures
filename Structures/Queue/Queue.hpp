@@ -27,6 +27,7 @@ namespace datastruct{
     void enqueue(Node<T> *);
 
     Node<T> * front();
+    Node<T> * last();
     Node<T> * dequeue();
 
     bool operator == (const Queue<T> &) const;
@@ -66,6 +67,11 @@ namespace datastruct{
   template <class T>
   Node<T> * Queue<T>::front(){
     return LinkedList<T>::first();
+  }
+
+  template <class T>
+  Node<T> * Queue<T>::last(){
+    return LinkedList<T>::at(size() - 1);
   }
 
   template <class T>
