@@ -77,7 +77,7 @@ int main(){
 
   std::cout << "SEARCH FOR NODE" << std::endl;
   int * iPtr { new int(7) };
-  BNode<int *> * found = btree.search(iPtr);
+  BNode<int *> * found { btree.search(iPtr) };
   delete iPtr;
   if(found){ std::cout << *found->getInfo(); }
   std::cout << "\n" << std::endl;
@@ -113,6 +113,7 @@ bool ensembleTree(BPTRArray & t_nodes, BinaryTree<int *> & t_btree){
 // Function to initialize the BNode pointers array
 void initBPTRArray(BPTRArray & t_nodes){
   for(auto i = 0; i < t_nodes.size(); i++){
+    // Deleted by BNodes later on
     t_nodes[i] = new BNode<int *>(new int(i + 1));
   }
 }
