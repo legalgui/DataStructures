@@ -23,8 +23,8 @@ namespace huffmanutilities{
 
   public:
 
-      LinkedList<std::string *> * m_sentMsg = new LinkedList<std::string *>();
-      LinkedList<std::string *> * m_recievedMsg = new LinkedList<std::string *>();
+      LinkedList<std::string *> * m_sentMsg { new LinkedList<std::string *>() };
+      LinkedList<std::string *> * m_recievedMsg { new LinkedList<std::string *>() };
 
       Terminal() {}
       Terminal(std::string t_name, std::string t_password, int t_ID) : m_name(t_name), m_password(t_password), m_ID(t_ID)  {}
